@@ -1350,7 +1350,8 @@ function renderPagesBar() {
     `<button class="page-tab${i===S.pageIdx?' active':''}" onclick="selectPage(${i})">
       ${e ? `<input class="page-name-inp" value="${esc(p.name)}"
               onchange="renamePage(${i},this.value)"
-              onclick="event.stopPropagation();selectPage(${i})">` : esc(p.name)}
+              onclick="event.stopPropagation()"
+              onfocus="if(${i}!==S.pageIdx){selectPage(${i});}">` : esc(p.name)}
       ${e && c.pages.length>1 ? `<span class="pdel" onclick="event.stopPropagation();deletePage(${i})">×</span>` : ''}
     </button>`
   ).join('') + (e ? `<button class="page-tab page-tab-add" onclick="addPage()">+</button>` : '');

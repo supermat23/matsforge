@@ -671,16 +671,7 @@ button { cursor: pointer; border: none; background: none; }
 }
 .toast.show { opacity: 1; }
 
-/* PWA Bar */
-.pwa-bar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: var(--bg-card); border-top: 2px solid var(--border);
-  padding: 12px 14px calc(var(--safe-b) + 12px);
-  display: none; align-items: center; gap: 12px; z-index: 120;
-}
-.pwa-bar.show { display: flex; }
-.pwa-bar-text { flex: 1; font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600; }
-
+/* Install button menu - caché par défaut */
 #menuInstallItem { display: none; }
 
 .install-btn {
@@ -727,6 +718,7 @@ button { cursor: pointer; border: none; background: none; }
         <div class="dropdown-item" onclick="exportToFile()"><span class="ic">📤</span>Exporter</div>
         <div class="dropdown-item" onclick="importFromFile()"><span class="ic">📥</span>Importer</div>
         <div class="dropdown-item" onclick="toggleTheme()"><span class="ic">🌓</span>Thème</div>
+        <div class="dropdown-item" id="menuInstallItem" onclick="installPWA()"><span class="ic">⬇️</span>Installer l'appli</div>
       </div>
     </div>
   </div>
@@ -809,16 +801,43 @@ button { cursor: pointer; border: none; background: none; }
   </div>
 </div>
 
-<!-- TOAST + PWA + FILE -->
+<!-- TOAST + FILE -->
 <div class="toast" id="toast"></div>
-<div class="pwa-bar" id="pwaBar">
-  <div class="pwa-bar-text">Installer Mat's Forge</div>
-  <button class="btn sm primary" onclick="installPWA()">Installer</button>
-  <button class="btn sm ghost"   onclick="dismissPWA()">Plus tard</button>
-</div>
 <input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileImport(event)">
 
 <script>
+/* ══════════════════════════════════════
+   REDIRECT 127.0.0.1 → localhost
+   (doit être en tout premier)
+══════════════════════════════════════ */
+(function() {
+  if (window.location.hostname === '127.0.0.1') {
+    window.location.replace(window.location.href.replace('127.0.0.1', 'localhost'));
+  }
+})();
+
+/* ══════════════════════════════════════
+   WAKE LOCK — écran toujours allumé
+══════════════════════════════════════ */
+let wakeLock = null;
+
+async function requestWakeLock() {
+  if ('wakeLock' in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } catch (err) {
+      console.warn('[WakeLock]', err.message);
+    }
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') requestWakeLock();
+});
+
+requestWakeLock();
+
 /* ══════════════════════════════════════
    CONSTANTS
 ══════════════════════════════════════ */
@@ -1890,13 +1909,9 @@ function setupDragAndDrop() {
 ══════════════════════════════════════ */
 let deferredPrompt = null;
 
-function showInstallBtn() {
+function showInstallUI() {
   const btn = $('installBtn');
   if (btn) btn.classList.add('show');
-  if (!sessionStorage.getItem('pwa_dismissed')) {
-    $('pwaBar').classList.add('show');
-  }
-  // Afficher l'item du menu seulement quand le prompt est dispo
   const mi = $('menuInstallItem');
   if (mi) mi.style.display = 'flex';
 }
@@ -1904,8 +1919,6 @@ function showInstallBtn() {
 function hideInstallUI() {
   const btn = $('installBtn');
   if (btn) btn.classList.remove('show');
-  $('pwaBar').classList.remove('show');
-  // Masquer l'item du menu
   const mi = $('menuInstallItem');
   if (mi) mi.style.display = 'none';
 }
@@ -1914,25 +1927,19 @@ window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
   if (!window.matchMedia('(display-mode: standalone)').matches) {
-    showInstallBtn();
+    showInstallUI();
   }
 });
 
 function installPWA() {
   closeMenu();
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(r => {
-      if (r.outcome === 'accepted') showToast('✅ Mat\'s Forge installé !');
-      deferredPrompt = null;
-      hideInstallUI();
-    });
-  }
-}
-
-function dismissPWA() {
-  $('pwaBar').classList.remove('show');
-  sessionStorage.setItem('pwa_dismissed', '1');
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(r => {
+    if (r.outcome === 'accepted') showToast("✅ Mat's Forge installé !");
+    deferredPrompt = null;
+    hideInstallUI();
+  });
 }
 
 window.addEventListener('appinstalled', () => {
@@ -1941,7 +1948,7 @@ window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
 });
 
-// Masquer tout si déjà installé en mode standalone
+// Déjà installé en mode standalone
 if (window.matchMedia('(display-mode: standalone)').matches) {
   hideInstallUI();
 }

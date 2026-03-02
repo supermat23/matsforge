@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2c3e50" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161a1f" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="./manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mat's Forge">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
+<meta name="description" content="Créateur de fiches de personnage pour jeux de rôle">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Mat's Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg-page:#f2efe8;--bg-card:#ffffff;--bg-raised:#f8f6f1;--bg-input:#ffffff;--bg-muted:#ece9e0;--text:#1a1a1a;--text-2:#4a4a4a;--text-3:#888888;--accent:#2c3e50;--accent-2:#3d566e;--gold:#c9aa71;--red:#c0392b;--green:#27ae60;--border:rgba(0,0,0,0.10);--border-2:rgba(0,0,0,0.18);--shadow-sm:0 1px 4px rgba(0,0,0,0.06);--shadow:0 3px 12px rgba(0,0,0,0.10);--shadow-lg:0 12px 40px rgba(0,0,0,0.18);--r:6px;--gap:5px;--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px);--btn-h:34px;--fs-label:9px;--fs-value:30px;--fs-text:14px;--field-pad:8px;}
+[data-theme="dark"]{--bg-page:#161a1f;--bg-card:#1e2530;--bg-raised:#242b38;--bg-input:#1a2030;--bg-muted:#1a2028;--text:#e8e4d8;--text-2:#a09880;--text-3:#585e6a;--accent:#7eb8e2;--accent-2:#9fcaec;--gold:#c9aa71;--red:#e05040;--green:#3ab870;--border:rgba(255,255,255,0.08);--border-2:rgba(255,255,255,0.16);--shadow-sm:0 1px 4px rgba(0,0,0,0.3);--shadow:0 3px 12px rgba(0,0,0,0.45);--shadow-lg:0 12px 40px rgba(0,0,0,0.6);}
+@media(min-width:600px){:root{--fs-label:10px;--fs-value:34px;--fs-text:15px;--btn-h:36px;--field-pad:10px;--gap:6px;}}
+@media(min-width:1025px){:root{--fs-label:11px;--fs-value:38px;--fs-text:16px;--btn-h:40px;--field-pad:12px;--gap:8px;}.main{max-width:1100px;padding:16px;padding-bottom:40px;}.panel{padding:18px;margin-bottom:18px;border-radius:10px;}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{height:100%;}
+body{background:var(--bg-page);color:var(--text);font-family:'Lora',Georgia,serif;line-height:1.4;min-height:100dvh;-webkit-tap-highlight-color:transparent;overflow-x:hidden;overscroll-behavior-y:none;}
+button,input,textarea,select{font-family:inherit;}
+button{cursor:pointer;border:none;background:none;}
+.topbar{position:sticky;top:0;z-index:90;background:var(--bg-card);border-bottom:1px solid var(--border-2);padding:8px 12px;padding-top:max(8px,calc(var(--safe-t)+4px));display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);}
+.topbar-logo{font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:var(--accent);letter-spacing:0.5px;white-space:nowrap;flex-shrink:0;}
+.topbar-logo span{font-weight:500;color:var(--text-3);}
+.mode-toggle{display:flex;background:var(--bg-muted);border:1px solid var(--border-2);border-radius:var(--r);overflow:hidden;flex-shrink:0;}
+.mode-btn{padding:7px 12px;font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;background:transparent;color:var(--text-3);cursor:pointer;transition:all 0.15s;}
+.mode-btn.active{background:var(--accent);color:#fff;}
+.save-indicator{width:7px;height:7px;border-radius:50%;opacity:0;transition:opacity 0.3s;flex-shrink:0;}
+.save-indicator.pending{background:var(--gold);opacity:1;}
+.save-indicator.saved{background:var(--green);opacity:1;}
+.menu-btn{width:38px;height:38px;border-radius:var(--r);border:1px solid var(--border-2);background:var(--bg-card);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;padding:10px 7px;transition:background 0.15s;flex-shrink:0;}
+.menu-btn span{width:16px;height:2px;background:var(--text);border-radius:1px;transition:all 0.2s;}
+.menu-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.menu-btn.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.menu-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+.menu-btn:active{background:var(--bg-muted);}
+.dropdown{position:relative;}
+.dropdown-menu{position:absolute;top:calc(100%+8px);right:0;background:var(--bg-card);border:1px solid var(--border-2);border-radius:10px;min-width:170px;box-shadow:var(--shadow-lg);opacity:0;visibility:hidden;transform:translateY(-8px) scale(0.97);transition:all 0.18s;z-index:200;overflow:hidden;}
+.dropdown-menu.show{opacity:1;visibility:visible;transform:translateY(0) scale(1);}
+.dropdown-item{display:flex;align-items:center;gap:10px;padding:13px 15px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.3px;color:var(--text);cursor:pointer;transition:background 0.1s;border-bottom:1px solid var(--border);}
+.dropdown-item:last-child{border-bottom:none;}
+.dropdown-item:active{background:var(--bg-muted);}
+.dropdown-item .ic{font-size:15px;width:18px;text-align:center;}
+.char-name-bar{background:var(--bg-raised);border-bottom:1px solid var(--border);padding:7px 12px;display:none;align-items:center;justify-content:center;gap:10px;}
+.char-name-bar.show{display:flex;}
+.char-name-input{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--accent);background:transparent;border:none;border-bottom:2px solid var(--border-2);text-align:center;padding:4px 6px;min-width:120px;max-width:220px;outline:none;}
+.char-name-input:focus{border-color:var(--accent);}
+.char-bar{background:var(--bg-page);border-bottom:1px solid var(--border);padding:7px 12px;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;}
+.char-bar::-webkit-scrollbar{display:none;}
+.char-chip{flex-shrink:0;padding:6px 13px;border-radius:20px;border:2px solid var(--border-2);background:var(--bg-card);font-family:'Cinzel',serif;font-size:11px;font-weight:600;color:var(--text-2);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px;}
+.char-chip.active{border-color:var(--accent);color:var(--accent);}
+.char-chip-del{opacity:0.35;font-size:13px;transition:opacity 0.1s;}
+.char-chip:active .char-chip-del{opacity:1;}
+.char-chip-add{width:30px;height:30px;border-radius:50%;border:2px dashed var(--border-2);background:transparent;color:var(--text-3);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.char-chip-add:active{border-color:var(--accent);color:var(--accent);}
+.pages-bar{display:flex;background:var(--bg-card);border-bottom:2px solid var(--border);padding:0 6px;overflow-x:auto;scrollbar-width:none;}
+.pages-bar::-webkit-scrollbar{display:none;}
+.page-tab{padding:11px 14px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.4px;text-transform:uppercase;font-weight:600;color:var(--text-3);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all 0.15s;}
+.page-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.page-tab .pdel{opacity:0.3;font-size:13px;}
+.page-tab:active .pdel{opacity:1;color:var(--red);}
+.page-tab-add{color:var(--text-3);font-size:20px;padding:8px 12px;}
+.page-name-inp{background:transparent;border:none;outline:none;font:inherit;color:inherit;text-align:center;padding:0;min-width:40px;max-width:90px;}
+.main{padding:8px;max-width:800px;margin:0 auto;padding-bottom:calc(var(--safe-b)+80px);}
+.panel{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:var(--field-pad);margin-bottom:10px;box-shadow:var(--shadow-sm);transition:box-shadow 0.2s;animation:panelIn 0.2s ease;}
+@keyframes panelIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.panel:hover{box-shadow:var(--shadow);}
+.panel-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:2px solid var(--border);}
+.panel-title{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;flex:1;}
+.panel-title-input{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;background:transparent;border:none;border-bottom:2px solid var(--border);outline:none;flex:1;padding-bottom:3px;color:var(--text);}
+.panel-title-input:focus{border-color:var(--accent);}
+.panel-actions{display:flex;gap:3px;}
+.btn-icon{width:30px;height:30px;border-radius:5px;border:1px solid var(--border-2);background:var(--bg-raised);color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.12s;}
+.btn-icon:active{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(0.94);}
+.btn-icon.danger:active{background:var(--red);border-color:var(--red);}
+.btn-icon.sm{width:26px;height:26px;font-size:11px;}
+.btn{font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:0.3px;text-transform:uppercase;padding:0 14px;height:var(--btn-h);border-radius:var(--r);cursor:pointer;border:2px solid var(--border-2);background:var(--bg-card);color:var(--text);display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s;white-space:nowrap;}
+.btn:active{transform:scale(0.96);}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn.danger{background:transparent;color:var(--red);border-color:var(--red);}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--text-2);}
+.btn.ghost:active{background:var(--bg-muted);border-color:var(--border-2);}
+.btn.sm{height:calc(var(--btn-h)-6px);padding:0 10px;font-size:8px;}
+.btn.xs{height:calc(var(--btn-h)-10px);padding:0 8px;font-size:7px;}
+.color-dot{width:26px;height:26px;border-radius:5px;border:2px solid var(--border-2);cursor:pointer;flex-shrink:0;transition:transform 0.12s;}
+.color-dot:active{transform:scale(0.9);}
+.fields-container{display:flex;flex-direction:column;gap:2px;}
+.fields-row{display:flex;width:100%;align-items:stretch;gap:var(--gap);}
+.fields-row.partial{justify-content:center;}
+.field-box{background:var(--bg-raised);border:1px solid var(--border);border-radius:5px;padding:var(--field-pad);display:flex;flex-direction:column;gap:4px;transition:border-color 0.15s;min-width:0;}
+.field-box[data-w="auto"]{flex:1 1 0;}
+.field-box[data-w="25"]{flex:0 0 calc(25% - var(--gap));max-width:calc(25% - var(--gap));}
+.field-box[data-w="33"]{flex:0 0 calc(33.333% - var(--gap));max-width:calc(33.333% - var(--gap));}
+.field-box[data-w="50"]{flex:0 0 calc(50% - var(--gap));max-width:calc(50% - var(--gap));}
+.field-box[data-w="100"]{flex:0 0 100%;max-width:100%;}
+.field-box[data-align="center"]{align-items:center;}
+.field-box[data-align="center"] .field-label,.field-box[data-align="center"] .field-label-inp{text-align:center;}
+.field-label{font-family:'Cinzel',serif;font-size:var(--fs-label);letter-spacing:0.7px;text-transform:uppercase;color:var(--text-3);font-weight:600;width:100%;}
+.field-label-inp{font-family:'Cinzel',serif;font-size:var(--fs-label);letter-spacing:0.7px;text-transform:uppercase;background:transparent;border:none;border-bottom:1px dashed var(--border-2);outline:none;padding-bottom:2px;color:var(--text-2);width:100%;font-weight:600;}
+.field-label-inp:focus{border-color:var(--accent);border-style:solid;}
+.field-number{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;}
+.num-val{font-family:'Cinzel',serif;font-size:var(--fs-value);font-weight:700;min-width:44px;text-align:center;line-height:1;padding:4px 8px;cursor:pointer;border-radius:5px;transition:background 0.12s;}
+.num-val:active{background:var(--bg-muted);}
+.num-btns{display:flex;gap:5px;}
+.num-btn{width:var(--btn-h);height:var(--btn-h);border-radius:5px;border:2px solid var(--border-2);background:var(--bg-card);color:var(--text);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.1s;}
+.num-btn:active{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(0.92);}
+.health-wrap{display:flex;flex-direction:column;gap:4px;width:100%;}
+.health-bar-outer{width:100%;background:var(--bg-muted);border-radius:999px;overflow:hidden;position:relative;}
+.health-bar-fill{height:100%;border-radius:999px;transition:width 0.35s;position:relative;background:var(--red);}
+.health-ctrl{display:flex;align-items:center;justify-content:center;gap:6px;}
+.health-btn{width:28px;height:28px;border-radius:999px;border:2px solid var(--border-2);background:var(--bg-card);color:var(--text);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
+.health-btn.dmg:active{background:var(--red);color:#fff;border-color:var(--red);transform:scale(0.90);}
+.health-btn.heal:active{background:var(--green);color:#fff;border-color:var(--green);transform:scale(0.90);}
+.health-curr{font-family:'Cinzel',serif;font-size:18px;font-weight:700;text-align:center;cursor:pointer;padding:3px 2px;transition:background 0.12s;}
+.health-curr:active{background:var(--bg-muted);}
+.health-max-lbl{font-family:'Cinzel',serif;font-size:14px;font-weight:600;color:var(--text-3);text-align:center;}
+.dots-row,.sq-row{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
+.dot,.sq{border:2.5px solid;background:transparent;cursor:pointer;transition:all 0.1s;flex-shrink:0;}
+.dot{border-radius:50%;}
+.sq{border-radius:3px;}
+.dot:active,.sq:active{transform:scale(1.2);}
+.dot[data-sz="3"],.sq[data-sz="3"]{width:20px;height:20px;}
+.dot[data-sz="4"],.sq[data-sz="4"]{width:26px;height:26px;}
+.f-text{width:100%;background:var(--bg-input);border:2px solid var(--border);border-radius:var(--r);padding:8px 10px;font-family:'Lora',serif;font-size:var(--fs-text);color:var(--text);outline:none;transition:border-color 0.15s;}
+.f-text:focus{border-color:var(--accent);}
+.f-textarea{width:100%;background:var(--bg-input);border:2px solid var(--border);border-radius:var(--r);padding:10px;font-family:'Lora',serif;font-size:var(--fs-text);color:var(--text);outline:none;resize:vertical;min-height:70px;transition:border-color 0.15s;}
+.f-textarea:focus{border-color:var(--accent);}
+.status-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.status-badge{display:inline-flex;align-items:center;padding:8px 13px;border-radius:6px;border:2px solid;cursor:pointer;transition:all 0.15s;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;white-space:nowrap;min-height:36px;}
+.status-badge.inactive{background:var(--bg-card);border-color:var(--border-2);color:var(--text-2);}
+.status-badge.active{color:#fff;}
+.status-badge:active{transform:scale(0.94);}
+.checklist-h{display:flex;gap:5px;flex-wrap:wrap;width:100%;}
+.checklist-v{display:flex;flex-direction:column;gap:4px;width:100%;}
+.checklist-item{display:flex;align-items:center;gap:7px;padding:8px 11px;background:var(--bg-card);border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:all 0.1s;}
+.checklist-item:active{background:var(--bg-muted);}
+.checklist-box{width:18px;height:18px;border-radius:3px;border:2px solid var(--border-2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all 0.12s;color:#fff;}
+.checklist-text{font-size:12px;color:var(--text-2);line-height:1.2;}
+.checklist-text.done{font-weight:700;}
+.checklist-text.struck{font-weight:700;text-decoration:line-through;opacity:0.6;}
+.field-settings{margin-top:6px;padding:6px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);display:none;flex-direction:column;gap:4px;width:100%;}
+.field-settings.open{display:flex;}
+.setting-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+.setting-row label{font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;color:var(--text-3);min-width:28px;}
+.setting-row input[type="number"],.setting-row input[type="text"]{flex:1;min-width:0;padding:4px 6px;border:1px solid var(--border-2);border-radius:3px;font-size:11px;background:var(--bg-input);color:var(--text);outline:none;}
+.setting-row input:focus{border-color:var(--accent);}
+.mini-group{display:flex;gap:1px;background:var(--bg-muted);border:1px solid var(--border);border-radius:3px;padding:1px;}
+.mini-btn{min-width:20px;height:18px;border:none;background:transparent;color:var(--text-3);cursor:pointer;border-radius:2px;padding:0 3px;font-family:'Cinzel',serif;font-size:8px;font-weight:700;transition:all 0.1s;text-transform:uppercase;}
+.mini-btn.on{background:var(--accent);color:#fff;}
+.field-ctrl-row{display:flex;gap:2px;padding-top:4px;border-top:1px solid var(--border);}
+.add-field-bar{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border-2);}
+.add-field-btn{padding:5px 8px;border-radius:var(--r);border:1px solid var(--border-2);background:transparent;color:var(--text-3);font-family:'Cinzel',serif;font-size:7px;font-weight:700;letter-spacing:0.3px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;}
+.add-field-btn:active{border-color:var(--accent);color:var(--accent);background:var(--bg-muted);}
+.add-panel-wrap{border:2px dashed var(--border-2);border-radius:8px;padding:14px;text-align:center;margin-bottom:10px;cursor:pointer;transition:all 0.15s;}
+.add-panel-wrap:active{border-color:var(--accent);background:var(--bg-muted);}
+.add-panel-btn{font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;color:var(--text-3);border:none;background:none;}
+.empty-state{text-align:center;padding:44px 20px;color:var(--text-3);}
+.empty-state h2{font-family:'Cinzel',serif;font-size:15px;letter-spacing:0.5px;margin-bottom:10px;color:var(--accent);font-weight:700;}
+.empty-state p{font-style:italic;font-size:13px;}
+.overlay{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,0.42);display:none;opacity:0;transition:opacity 0.22s;}
+.overlay.show{display:block;opacity:1;}
+.sheet{position:fixed;z-index:160;bottom:0;left:0;right:0;background:var(--bg-card);border-top:1px solid var(--border-2);border-radius:16px 16px 0 0;padding:20px 18px calc(var(--safe-b)+20px);max-height:88dvh;overflow-y:auto;display:none;transform:translateY(20px);transition:transform 0.25s;}
+.sheet::before{content:'';display:block;width:36px;height:4px;background:var(--border-2);border-radius:2px;margin:-8px auto 16px;}
+.sheet.show{display:block;transform:translateY(0);}
+#sheetTemplate.show{display:flex;flex-direction:column;}
+.sheet-title{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--accent);text-align:center;margin-bottom:14px;}
+.sheet-input{width:100%;background:var(--bg-input);border:2px solid var(--border-2);border-radius:var(--r);padding:11px 13px;font-family:'Lora',serif;font-size:16px;color:var(--text);outline:none;margin-bottom:14px;}
+.sheet-input:focus{border-color:var(--accent);}
+.sheet-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.sheet-sub{font-size:11px;color:var(--text-3);text-align:center;margin-bottom:12px;font-style:italic;}
+.num-modal{position:fixed;z-index:160;top:15%;left:50%;transform:translateX(-50%);background:var(--bg-card);border:1px solid var(--border-2);border-radius:14px;padding:22px 20px;width:min(92%,340px);display:none;}
+.num-modal.show{display:block;}
+.num-modal-title{font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--accent);text-align:center;margin-bottom:10px;}
+.num-modal-preview{font-family:'Cinzel',serif;font-size:48px;font-weight:700;text-align:center;padding:6px 0;min-height:64px;}
+.num-modal-modes{display:flex;gap:5px;margin-bottom:12px;}
+.num-mode-btn{flex:1;height:38px;border-radius:var(--r);border:2px solid var(--border-2);background:var(--bg-raised);color:var(--text-2);font-family:'Cinzel',serif;font-size:9px;font-weight:700;cursor:pointer;}
+.num-mode-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.num-modal-input{width:100%;background:var(--bg-input);border:2px solid var(--border-2);border-radius:var(--r);padding:14px;font-family:'Cinzel',serif;font-size:26px;font-weight:700;text-align:center;color:var(--text);outline:none;margin-bottom:14px;}
+.num-modal-input:focus{border-color:var(--accent);}
+.save-item{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;}
+.save-item.sel{border-color:var(--accent);background:var(--bg-card);}
+.save-item-info{flex:1;cursor:pointer;}
+.save-item-name{font-family:'Cinzel',serif;font-size:12px;font-weight:600;}
+.save-item-date{font-size:10px;color:var(--text-3);margin-top:2px;}
+.color-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;padding:4px;}
+.color-swatch{aspect-ratio:1;border-radius:5px;cursor:pointer;border:2px solid transparent;transition:all 0.1s;}
+.color-swatch:active{transform:scale(1.15);}
+.color-swatch.active{border-color:var(--text);}
+.toast{position:fixed;bottom:calc(var(--safe-b)+20px);left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-family:'Cinzel',serif;font-size:10px;font-weight:700;padding:10px 22px;border-radius:20px;opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:300;}
+.toast.show{opacity:1;}
+#menuInstallItem{display:none;}
+.install-btn{display:none;align-items:center;gap:5px;padding:0 10px;height:32px;border-radius:var(--r);border:2px solid var(--gold);background:transparent;color:var(--gold);font-family:'Cinzel',serif;font-size:8px;font-weight:700;cursor:pointer;}
+.install-btn.show{display:flex;}
+.dice-roller{display:flex;flex-direction:column;gap:6px;width:100%;}
+.dice-pool-row{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;min-height:28px;padding:4px 6px;background:var(--bg-muted);border-radius:var(--r);border:1px solid var(--border);}
+.dice-pool-chip{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:12px;background:var(--accent);color:#fff;font-family:'Cinzel',serif;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.1s;}
+.dice-pool-chip:active{transform:scale(0.9);background:var(--red);}
+.dice-pool-empty{font-family:'Cinzel',serif;font-size:9px;color:var(--text-3);align-self:center;width:100%;text-align:center;}
+.dice-btns{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
+.dice-btn{position:relative;padding:6px 10px;border-radius:5px;border:2px solid var(--border-2);background:var(--bg-card);color:var(--text);font-family:'Cinzel',serif;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.12s;}
+.dice-btn:active{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(0.92);}
+.dice-btn-count{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;font-size:8px;font-weight:700;display:none;align-items:center;justify-content:center;font-family:'Cinzel',serif;}
+.dice-btn-count.show{display:flex;}
+.dice-mod-open-btn{padding:7px 12px;border-radius:var(--r);border:2px solid var(--border-2);background:var(--bg-raised);color:var(--text-2);font-family:'Cinzel',serif;font-size:9px;font-weight:700;cursor:pointer;transition:all 0.12s;white-space:nowrap;}
+.dice-mod-open-btn:active{background:var(--bg-muted);}
+.dice-mod-open-btn.active{border-color:var(--accent);color:var(--accent);}
+/* Dice mod modal */
+.dice-mod-modal{position:fixed;z-index:160;bottom:0;left:0;right:0;background:var(--bg-card);border-top:1px solid var(--border-2);border-radius:16px 16px 0 0;padding:20px 18px calc(var(--safe-b)+20px);display:none;transform:translateY(20px);transition:transform 0.25s;max-width:380px;margin:0 auto;}
+.dice-mod-modal::before{content:'';display:block;width:36px;height:4px;background:var(--border-2);border-radius:2px;margin:-8px auto 16px;}
+.dice-mod-modal.show{display:block;transform:translateY(0);}
+.dice-mod-title{font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--accent);text-align:center;margin-bottom:12px;}
+.dice-mod-sign-row{display:flex;gap:8px;margin-bottom:14px;justify-content:center;}
+.dice-mod-sign-btn{flex:1;max-width:100px;height:44px;border-radius:var(--r);border:2px solid var(--border-2);background:var(--bg-raised);font-family:'Cinzel',serif;font-size:20px;font-weight:700;cursor:pointer;transition:all 0.12s;}
+.dice-mod-sign-btn.active.plus{background:var(--green);color:#fff;border-color:var(--green);}
+.dice-mod-sign-btn.active.minus{background:var(--red);color:#fff;border-color:var(--red);}
+.dice-mod-preview{font-family:'Cinzel',serif;font-size:42px;font-weight:700;text-align:center;padding:6px 0 12px;color:var(--accent);}
+.dice-mod-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+.dice-mod-key{height:48px;border-radius:var(--r);border:1px solid var(--border-2);background:var(--bg-raised);font-family:'Cinzel',serif;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.1s;}
+.dice-mod-key:active{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(0.96);}
+.dice-mod-key.del{font-size:14px;color:var(--text-3);}
+.dice-mod-key.zero{grid-column:span 2;}
+.dice-roll-btn{flex:1;padding:7px;border-radius:var(--r);border:2px solid var(--accent);background:var(--accent);color:#fff;font-family:'Cinzel',serif;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.12s;}
+.dice-roll-btn:active{transform:scale(0.96);filter:brightness(0.9);}
+.dice-clear-btn{padding:7px 10px;border-radius:var(--r);border:2px solid var(--border-2);background:transparent;color:var(--text-3);font-family:'Cinzel',serif;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.12s;}
+.dice-clear-btn:active{background:var(--bg-muted);}
+.dice-result-box{background:var(--bg-muted);border-radius:var(--r);padding:6px 8px;text-align:center;}
+.dice-result-total{font-family:'Cinzel',serif;font-size:34px;font-weight:700;color:var(--accent);line-height:1;}
+.dice-result-formula{font-family:'Cinzel',serif;font-size:11px;color:var(--text-3);margin-bottom:3px;font-weight:600;}
+.dice-result-detail{font-family:'Cinzel',serif;font-size:13px;color:var(--text-2);margin-top:4px;word-break:break-all;font-weight:600;letter-spacing:0.3px;}
+.dice-log{position:fixed;bottom:calc(var(--safe-b)+70px);left:50%;transform:translateX(-50%);background:var(--bg-card);border:1px solid var(--border-2);border-radius:8px;padding:8px 16px;font-family:'Cinzel',serif;font-size:11px;box-shadow:var(--shadow);z-index:290;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+.dice-log.show{opacity:1;}
+/* Ring widget */
+.ring-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;}
+.ring-svg-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+.ring-svg{transform:rotate(-90deg);overflow:visible;}
+.ring-track{fill:none;stroke:var(--bg-muted);}
+.ring-fill{fill:none;stroke-linecap:round;transition:stroke-dashoffset 0.4s ease;}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:all;}
+.ring-val{font-family:'Cinzel',serif;font-weight:700;line-height:1;cursor:pointer;}
+.ring-max-lbl{font-family:'Cinzel',serif;font-size:9px;color:var(--text-3);line-height:1;}
+.ring-btns{display:flex;gap:5px;}
+.ring-btn{width:28px;height:28px;border-radius:50%;border:2px solid var(--border-2);background:var(--bg-card);color:var(--text);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.12s;}
+.ring-btn.dmg:active{background:var(--red);color:#fff;border-color:var(--red);transform:scale(0.9);}
+.ring-btn.heal:active{background:var(--green);color:#fff;border-color:var(--green);transform:scale(0.9);}
+.template-grid{display:flex;flex-direction:column;gap:4px;padding:2px 0;}
+.tpl-cat-header{font-family:'Cinzel',serif;font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.8px;padding:10px 2px 4px;border-bottom:1px solid var(--border);}
+.tpl-cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;padding:6px 0;}
+.template-card{background:var(--bg-raised);border:2px solid var(--border-2);border-radius:8px;padding:10px 8px;cursor:pointer;transition:all 0.15s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.template-card:active{border-color:var(--accent);background:var(--bg-muted);transform:scale(0.97);}
+.tpl-icon{font-size:22px;line-height:1;}
+.tpl-name{font-family:'Cinzel',serif;font-size:10px;font-weight:700;color:var(--accent);}
+.tpl-desc{font-size:9px;color:var(--text-3);}
+.field-box[draggable="true"]{cursor:grab;}
+.field-box.dragging{opacity:0.4;}
+.field-box.drag-over{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);}
+.field-box.touch-drag{opacity:0.6;transform:scale(1.02);}
+#error-overlay{position:fixed;top:0;left:0;right:0;background:#c0392b;color:#fff;padding:15px;z-index:9999;font-family:monospace;font-size:12px;display:none;white-space:pre-wrap;box-shadow:0 4px 12px rgba(0,0,0,0.3);border-bottom:4px solid #922b21;}
+/* Support modal styles */
+#sheetSupport .kofi-btn{background:#ff5e5e;color:#fff;border-color:#ff5e5e;}
+#sheetSupport .kofi-btn:active{filter:brightness(0.9);}
+#sheetSupport ul{list-style:none;padding-left:0;text-align:left;margin:0 auto 16px;max-width:280px;}
+#sheetSupport ul li{margin-bottom:6px;color:var(--text-2);}
+</style>
+</head>
+<body>
+<div id="error-overlay"></div>
+<div class="topbar">
+<div class="topbar-logo">MAT'S <span>FORGE</span></div>
+<div class="mode-toggle">
+<button class="mode-btn" id="modeEdit" onclick="setMode('edit')">Création</button>
+<button class="mode-btn" id="modePlay" onclick="setMode('play')">Jeu</button>
+</div>
+<div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+<button class="install-btn" id="installBtn" onclick="installPWA()">⬇ Installer</button>
+<div class="save-indicator" id="saveIndicator"></div>
+<div class="dropdown">
+<button class="menu-btn" id="menuBtn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+<div class="dropdown-menu" id="dropdownMenu">
+<div class="dropdown-item" onclick="openSupportSheet()" style="border-bottom:1px solid var(--border)">
+<span class="ic">❤️</span>Supporter le développeur
+</div>
+<div class="dropdown-item" onclick="openTemplateSheet()"><span class="ic">📋</span>Nouveau (Template)</div>
+<div class="dropdown-item" onclick="openSaveSheet()"><span class="ic">💾</span>Sauvegarder</div>
+<div class="dropdown-item" onclick="openLoadSheet()"><span class="ic">📂</span>Charger</div>
+<div class="dropdown-item" onclick="exportToFile()"><span class="ic">📤</span>Exporter</div>
+<div class="dropdown-item" onclick="importFromFile()"><span class="ic">📥</span>Importer</div>
+<div class="dropdown-item" onclick="toggleTheme()"><span class="ic">🌓</span>Thème</div>
+<div class="dropdown-item" id="menuInstallItem" onclick="installPWA()"><span class="ic">⬇️</span>Installer</div>
+</div>
+</div>
+</div>
+</div>
+<div class="char-name-bar" id="charNameBar">
+<input type="text" class="char-name-input" id="charNameInput" placeholder="Nom du personnage" onchange="updateCharName(this.value)" onclick="this.select()">
+<button class="btn-icon sm" onclick="duplicateChar()">⧉</button>
+</div>
+<div class="char-bar" id="charBar"></div>
+<div class="pages-bar" id="pagesBar"></div>
+<div class="main" id="mainContent"></div>
+<div class="overlay" id="ovSave" onclick="closeSaveSheet()"></div>
+<div class="overlay" id="ovLoad" onclick="closeLoadSheet()"></div>
+<div class="overlay" id="ovNum" onclick="closeNumModal()"></div>
+<div class="overlay" id="ovColor" onclick="closeColorPicker()"></div>
+<div class="overlay" id="ovConfirm" onclick="closeConfirmSheet()"></div>
+<div class="overlay" id="ovTemplate" onclick="closeTemplateSheet()"></div>
+<div class="overlay" id="ovSupport" onclick="closeSupportSheet()"></div>
+<div class="sheet" id="sheetTemplate" style="max-height:85dvh;">
+<div class="sheet-title">Choisir un Template</div>
+<div class="sheet-sub" style="margin-bottom:8px">Sélectionnez un modèle de fiche</div>
+<div class="template-grid" id="templateGrid" style="overflow-y:auto;flex:1;padding-right:2px"></div>
+<div class="sheet-actions" style="margin-top:10px;flex-shrink:0"><button class="btn ghost" onclick="closeTemplateSheet()">Annuler</button></div>
+</div>
+<div class="sheet" id="sheetSave">
+<div class="sheet-title">Sauvegarder</div>
+<input type="text" class="sheet-input" id="saveName" placeholder="Nom de la sauvegarde…">
+<div class="sheet-sub">Toucher une sauvegarde pour la mettre à jour</div>
+<div id="saveListSave" style="max-height:200px;overflow-y:auto;margin-bottom:14px"></div>
+<div class="sheet-actions"><button class="btn primary" onclick="performSave()">Nouvelle sauvegarde</button><button class="btn ghost" onclick="closeSaveSheet()">Annuler</button></div>
+</div>
+<div class="sheet" id="sheetLoad">
+<div class="sheet-title">Charger</div>
+<div class="sheet-sub">Remplacera les personnages actuels</div>
+<div id="saveList" style="max-height:300px;overflow-y:auto"></div>
+<div class="sheet-actions" style="margin-top:10px"><button class="btn ghost" onclick="closeLoadSheet()">Fermer</button></div>
+</div>
+<div class="num-modal" id="numModal">
+<div class="num-modal-title" id="numModalTitle">Modifier</div>
+<div class="num-modal-preview" id="numPreview">0</div>
+<div class="num-modal-modes">
+<button class="num-mode-btn active" id="numModeSet" onclick="setNumMode('set')">= Définir</button>
+<button class="num-mode-btn" id="numModeAdd" onclick="setNumMode('add')">+ Ajouter</button>
+<button class="num-mode-btn" id="numModeSub" onclick="setNumMode('sub')">− Soustraire</button>
+</div>
+<input type="number" class="num-modal-input" id="numInput" inputmode="numeric" placeholder="0">
+<div class="sheet-actions"><button class="btn primary" style="flex:1;height:48px" onclick="applyNumChange()">Valider ✓</button><button class="btn ghost" style="height:48px" onclick="closeNumModal()">Annuler</button></div>
+</div>
+<div class="sheet" id="sheetColor">
+<div class="sheet-title">Couleur</div>
+<div class="color-grid" id="colorGrid"></div>
+<div class="sheet-actions" style="margin-top:14px"><button class="btn ghost" onclick="closeColorPicker()">Annuler</button></div>
+</div>
+<div class="sheet" id="sheetConfirm" style="border-radius:14px;bottom:auto;top:50%;left:50%;transform:translate(-50%,-50%) !important;max-width:320px;padding:24px 20px">
+<div class="sheet-title" id="confirmTitle">Confirmer</div>
+<div class="sheet-sub" id="confirmText" style="margin-bottom:16px"></div>
+<div class="sheet-actions"><button class="btn primary" onclick="confirmYes()">Oui</button><button class="btn ghost" onclick="closeConfirmSheet()">Non</button></div>
+</div>
+<div class="overlay" id="ovDiceMod" onclick="closeDiceMod()"></div>
+<div class="dice-mod-modal" id="sheetDiceMod">
+<div class="dice-mod-title">Modificateur</div>
+<div class="dice-mod-sign-row">
+<button class="dice-mod-sign-btn plus active" id="diceModSignPlus" onclick="diceModSetSign(1)">+</button>
+<button class="dice-mod-sign-btn minus" id="diceModSignMinus" onclick="diceModSetSign(-1)">−</button>
+</div>
+<div class="dice-mod-preview" id="diceModPreview">+0</div>
+<div class="dice-mod-numpad">
+<button class="dice-mod-key" onclick="diceModKey('1')">1</button>
+<button class="dice-mod-key" onclick="diceModKey('2')">2</button>
+<button class="dice-mod-key" onclick="diceModKey('3')">3</button>
+<button class="dice-mod-key" onclick="diceModKey('4')">4</button>
+<button class="dice-mod-key" onclick="diceModKey('5')">5</button>
+<button class="dice-mod-key" onclick="diceModKey('6')">6</button>
+<button class="dice-mod-key" onclick="diceModKey('7')">7</button>
+<button class="dice-mod-key" onclick="diceModKey('8')">8</button>
+<button class="dice-mod-key" onclick="diceModKey('9')">9</button>
+<button class="dice-mod-key zero" onclick="diceModKey('0')">0</button>
+<button class="dice-mod-key del" onclick="diceModKey('del')">⌫</button>
+</div>
+<div class="sheet-actions">
+<button class="btn primary" style="flex:1;height:46px" onclick="applyDiceMod()">Valider ✓</button>
+<button class="btn ghost" style="height:46px" onclick="closeDiceModReset()">Supprimer mod</button>
+</div>
+</div>
+<!-- ❤️ Support Sheet -->
+<div class="sheet" id="sheetSupport">
+<div class="sheet-title">❤️ Soutenir Mat's Forge</div>
+<p style="text-align:center;margin-bottom:16px;font-style:italic;color:var(--text-2)">
+Je crée des applications mobiles utiles et sans publicité intrusive.
+</p>
+<p style="text-align:center;margin-bottom:8px;font-weight:600">Chaque soutien m'aide à :</p>
+<ul>
+<li>• ajouter de nouvelles fonctionnalités</li>
+<li>• maintenir les applications gratuites</li>
+<li>• améliorer les performances</li>
+</ul>
+<p style="text-align:center;margin-bottom:16px;font-weight:600">Merci énormément pour votre aide ☕</p>
+<div class="sheet-actions">
+<a href="https://ko-fi.com/supermatv2" target="_blank" class="btn kofi-btn">☕ Soutenir sur Ko-fi</a>
+<button class="btn ghost" onclick="closeSupportSheet()">Fermer</button>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="dice-log" id="diceLog"></div>
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileImport(event)">
+<script>
+/* === ERROR LOGGER === */
+window.onerror=function(msg,url,line){const overlay=document.getElementById('error-overlay');if(overlay){overlay.style.display='block';overlay.textContent='❌ ERREUR JS:\n'+msg+'\nLigne: '+line+'\nFichier: '+url;}return true;};
+/* === UTILS === */
+const $=id=>document.getElementById(id);
+const genId=()=>'_'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const clone=o=>JSON.parse(JSON.stringify(o));
+const esc=t=>{if(!t)return'';const d=document.createElement('div');d.textContent=String(t);return d.innerHTML;};
+const fmtDate=()=>new Date().toLocaleDateString('fr-FR')+' '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+/* === CONSTANTS === */
+const COLORS=['#c0392b','#e74c3c','#e67e22','#f39c12','#f1c40f','#27ae60','#1abc9c','#3498db','#2980b9','#9b59b6','#8e44ad','#34495e','#2c3e50','#000000','#ffffff'];
+const FIELD_LABELS={number:'Nombre',dice:'🎲 Dés',dots:'Points',squares:'Carrés',ring:'⭕ Anneau',text:'Texte',textarea:'Notes',status:'États',health:'Vie',healthmax:'Vie+Max','checklist-h':'Liste','checklist-v':'Liste↕'};
+const SK='forge_v32',SVK='forge_saves_v21';
+/* === DICE ROLLER === */
+// Pool state: { fieldId -> {pool:[{sides,count},...], mod:0} }
+const _dicePools={};
+function _getPool(fid){if(!_dicePools[fid])_dicePools[fid]={dice:{},mod:0};return _dicePools[fid];}
+function diceAddToPool(fid,sides){
+const pool=_getPool(fid);
+pool.dice[sides]=(pool.dice[sides]||0)+1;
+_renderDicePool(fid);
+}
+function diceRemoveOne(fid,sides){
+const pool=_getPool(fid);
+if(pool.dice[sides]>1)pool.dice[sides]--;
+else delete pool.dice[sides];
+_renderDicePool(fid);
+}
+function diceClear(fid){
+_dicePools[fid]={dice:{},mod:0};
+_renderDicePool(fid);
+_updateDiceModBtn(fid);
+const res=$('diceResult_'+fid);
+if(res){res.querySelector('.dice-result-formula').textContent='';res.querySelector('.dice-result-total').textContent='-';res.querySelector('.dice-result-detail').textContent='';}
+}
+function diceSetMod(fid,val){const pool=_getPool(fid);pool.mod=parseInt(val)||0;}
+/* === DICE MOD MODAL === */
+let _diceModFid=null,_diceModSign=1,_diceModDigits='';
+function openDiceMod(fid){
+_diceModFid=fid;
+const pool=_getPool(fid);
+const m=pool.mod||0;
+_diceModSign=m<0?-1:1;
+_diceModDigits=String(Math.abs(m))||'';
+_renderDiceModModal();
+$('ovDiceMod').classList.add('show');
+$('sheetDiceMod').classList.add('show');
+}
+function closeDiceMod(){$('ovDiceMod').classList.remove('show');$('sheetDiceMod').classList.remove('show');_diceModFid=null;}
+function closeDiceModReset(){if(_diceModFid){_getPool(_diceModFid).mod=0;_updateDiceModBtn(_diceModFid);}closeDiceMod();}
+function diceModSetSign(s){_diceModSign=s;_renderDiceModModal();}
+function diceModKey(k){
+if(k==='del'){_diceModDigits=_diceModDigits.slice(0,-1);}
+else{if(_diceModDigits.length>=3)return;_diceModDigits+=k;}
+_renderDiceModModal();
+}
+function _renderDiceModModal(){
+const n=parseInt(_diceModDigits)||0;
+const display=n===0?'0':(_diceModSign>0?'+':'-')+n;
+$('diceModPreview').textContent=display;
+$('diceModPreview').style.color=n===0?'var(--accent)':(_diceModSign>0?'var(--green)':'var(--red)');
+$('diceModSignPlus').className='dice-mod-sign-btn plus'+(_diceModSign>0?' active':'');
+$('diceModSignMinus').className='dice-mod-sign-btn minus'+(_diceModSign<0?' active':'');
+}
+function applyDiceMod(){
+if(!_diceModFid)return;
+const n=(parseInt(_diceModDigits)||0)*_diceModSign;
+_getPool(_diceModFid).mod=n;
+_updateDiceModBtn(_diceModFid);
+closeDiceMod();
+}
+function _updateDiceModBtn(fid){
+const btn=$('diceModBtn_'+fid);
+const lbl=$('diceModLabel_'+fid);
+if(!btn||!lbl)return;
+const m=_getPool(fid).mod||0;
+if(m===0){lbl.textContent='—';btn.classList.remove('active');}
+else{lbl.textContent=(m>0?'+':'')+m;btn.classList.add('active');}
+}
+function _renderDicePool(fid){
+const pool=_getPool(fid);
+const poolEl=$('dicePool_'+fid);
+if(!poolEl)return;
+const entries=Object.entries(pool.dice);
+if(!entries.length){poolEl.innerHTML='<span class="dice-pool-empty">Cliquez sur les dés pour composer votre lancer</span>';
+}else{
+poolEl.innerHTML=entries.map(([s,c])=>
+`<span class="dice-pool-chip" onclick="diceRemoveOne('${fid}',${s})" title="Cliquer pour retirer un d${s}">${c}d${s} ×</span>`
+).join('');
+}
+// Update count badges on buttons
+[4,6,8,10,12,20,100].forEach(s=>{
+const badge=$(`diceBadge_${fid}_${s}`);
+if(badge){const c=pool.dice[s]||0;badge.textContent=c;badge.className='dice-btn-count'+(c>0?' show':'');}
+});
+}
+function diceRoll(fid){
+const pool=_getPool(fid);
+const entries=Object.entries(pool.dice);
+if(!entries.length){showToast('⚠️ Sélectionnez des dés');return;}
+let allRolls=[],total=0,formulaParts=[],detailParts=[];
+entries.sort((a,b)=>+a[0]-+b[0]).forEach(([s,c])=>{
+const rolls=[];
+for(let i=0;i<c;i++){const r=Math.floor(Math.random()*(+s))+1;rolls.push(r);total+=r;}
+formulaParts.push(`${c}d${s}`);
+detailParts.push(`${c>1?c+'d'+s:'d'+s}:[${rolls.join('+')}]`);
+allRolls.push(...rolls);
+});
+const mod=pool.mod||0;
+total+=mod;
+const formula=formulaParts.join('+'+(mod>0?'':''  ))+( mod!==0?(mod>0?`+${mod}`:mod):'');
+const detail=detailParts.join(' ')+(mod!==0?(mod>0?` +${mod}`:` ${mod}`):'');
+// Update result box
+const res=$('diceResult_'+fid);
+if(res){
+res.querySelector('.dice-result-formula').textContent=formula+' =';
+res.querySelector('.dice-result-total').textContent=total;
+res.querySelector('.dice-result-detail').textContent=detail;
+}
+// Log
+const log=$('diceLog');
+log.textContent=`🎲 ${formula} = ${total}`;
+log.classList.add('show');
+clearTimeout(log._t);log._t=setTimeout(()=>log.classList.remove('show'),3500);
+if(navigator.vibrate)navigator.vibrate(50);
+}
+// Legacy compat
+function rollDice(sides,count=1,modifier=0,fieldId=null){
+let total=0;const rolls=[];
+for(let i=0;i<count;i++){const r=Math.floor(Math.random()*sides)+1;rolls.push(r);total+=r;}
+total+=modifier;
+const modText=modifier!==0?(modifier>0?`+${modifier}`:modifier):'';
+const log=$('diceLog');
+log.textContent=`🎲 ${count}d${sides}${modText} = ${total}`;
+log.classList.add('show');
+clearTimeout(log._t);log._t=setTimeout(()=>log.classList.remove('show'),3500);
+if(navigator.vibrate)navigator.vibrate(50);
+return total;
+}
+function rollAndShow(sides,count,mod,fieldId){return rollDice(sides,count,mod,fieldId);}
+/* === RING WIDGET === */
+function adjRing(pi,fi,d){const f=_fld(pi,fi);if(!f)return;f.value=clamp((f.value||0)+d,0,f.max||10);renderMain();schedSave();}
+function tapRing(pi,fi){const f=_fld(pi,fi);if(!f)return;openNumModal(pi,fi,false,f.label);}
+function rRing(f,pi,fi){
+const c=f.color||'#2c3e50',max=f.max||10,val=clamp(f.value||0,0,max),e=isEdit();
+const sz=f.ringSize||70;const r=sz/2-5;const circ=2*Math.PI*r;
+const pct=max>0?val/max:0;const dash=pct*circ;const gap=circ-dash;
+const fontSize=sz>60?Math.round(sz*0.24):Math.round(sz*0.26);
+const tapFn=!e?`onclick="tapRing(${pi},${fi})"`:'';
+return mkLbl(f,pi,fi)+`<div class="ring-wrap">
+<div class="ring-svg-wrap" style="width:${sz}px;height:${sz}px">
+<svg class="ring-svg" width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}">
+<circle class="ring-track" cx="${sz/2}" cy="${sz/2}" r="${r}" stroke-width="6"/>
+<circle class="ring-fill" cx="${sz/2}" cy="${sz/2}" r="${r}" stroke="${c}" stroke-width="6"
+stroke-dasharray="${dash} ${gap}" stroke-dashoffset="0"/>
+</svg>
+<div class="ring-center">
+<div class="ring-val" style="color:${c};font-size:${fontSize}px" ${tapFn}>${val}</div>
+${max>0?`<div class="ring-max-lbl">/${max}</div>`:''}
+</div>
+</div>
+<div class="ring-btns">
+<button class="ring-btn dmg" onclick="adjRing(${pi},${fi},-1)">−</button>
+<button class="ring-btn heal" onclick="adjRing(${pi},${fi},1)">+</button>
+</div>
+</div>`+(e?`<div class="field-settings open" id="fs_${f.id}">
+<div class="setting-row"><label>Max</label><input type="number" value="${max}" min="1" onchange="updateField(${pi},${fi},'max',+this.value||10)"></div>
+<div class="setting-row"><label>Taille</label><input type="number" value="${sz}" min="50" max="150" step="10" onchange="updateField(${pi},${fi},'ringSize',+this.value||70)"></div>
+<div class="setting-row"><label>Coul.</label>${mkColorDot(c,`openColorPicker('${c}',c=>updateField(${pi},${fi},'color',c))`)}</div>
+${mkWidthSel(f,pi,fi)}${mkAlignSel(f,pi,fi)}${mkNL(f,pi,fi)}${mkCtrl(pi,fi)}
+</div>`:'')};
+/* === TEMPLATES === */
+// Chaque template a un champ 'cat' pour la catégorie
+const TEMPLATES=[
+// Vitrine
+{id:'showcase',name:'Vitrine widgets',desc:'Tous les items',icon:'🧪',cat:'start',fn:()=>mkChar_Showcase('Aventurier')},
+// JdR Fantastique
+{id:'dnd5',name:'D&D 5e',desc:'Guerrier nain',icon:'⚔️',cat:'fantasy',fn:()=>mkChar_DND5()},
+{id:'pf2',name:'Pathfinder 2',desc:'Guerrière Aldori',icon:'🛡️',cat:'fantasy',fn:()=>mkChar_PF2()},
+{id:'warhammer',name:'WFRP 4e',desc:'Monde de l\'Ancien',icon:'🔨',cat:'fantasy',fn:()=>mkChar_Warhammer()},
+{id:'ironsworn',name:'Ironsworn',desc:'Terres de fer',icon:'🗡️',cat:'fantasy',fn:()=>mkChar_Ironsworn()},
+// JdR Horreur / Moderne
+{id:'coc',name:'L\'Appel de Cthulhu',desc:'Investigatrice 1920s',icon:'🐙',cat:'horror',fn:()=>mkChar_COC()},
+{id:'horror',name:'Horreur Survie',desc:'Post-apocalyptique',icon:'👻',cat:'horror',fn:()=>mkChar_Horror()},
+// JdR SciFi / Cyberpunk
+{id:'shadowrun',name:'Shadowrun 6e',desc:'Runner Pistolero',icon:'🐉',cat:'scifi',fn:()=>mkChar_Shadowrun()},
+{id:'scifi',name:'Sci-Fi',desc:'Commandante stellaire',icon:'🚀',cat:'scifi',fn:()=>mkChar_SciFi()},
+{id:'starwars',name:'Star Wars D6',desc:'Héros de la Galaxie',icon:'⭐',cat:'scifi',fn:()=>mkChar_Starwars()},
+// JdR Horreur Gothique
+{id:'vampire',name:'Vampire V5',desc:'Kindred Ventrue',icon:'🦇',cat:'gothic',fn:()=>mkChar_Vampire()},
+// Jeu de Plateau / Figurines
+{id:'zombicide',name:'Zombicide',desc:'Survivant zombie',icon:'🧟',cat:'board',fn:()=>mkChar_Zombicide()},
+{id:'gloomhaven',name:'Gloomhaven',desc:'Mercenaire donjons',icon:'🗝️',cat:'board',fn:()=>mkChar_Gloomhaven()},
+{id:'descent',name:'Descent JdT',desc:'Héros fantastique',icon:'🏰',cat:'board',fn:()=>mkChar_DescenteJdT()},
+{id:'kingdomdeath',name:'Kingdom Death',desc:'Survivant horreur',icon:'💀',cat:'board',fn:()=>mkChar_KingdomDeath()},
+{id:'massive',name:'Massive Darkness',desc:'Chasseur d\'ombres',icon:'🌑',cat:'board',fn:()=>mkChar_Massive()},
+// Générique
+{id:'generic',name:'Générique',desc:'Système universel',icon:'🎲',cat:'generic',fn:()=>mkChar_Generic()}
+];
+const TEMPLATE_CATS={
+start:{label:'Départ',icon:'🚀'},
+fantasy:{label:'Fantastique',icon:'⚔️'},
+horror:{label:'Horreur / Dark',icon:'👻'},
+scifi:{label:'Science-Fiction',icon:'🚀'},
+gothic:{label:'Gothique',icon:'🦇'},
+board:{label:'Jeu de Plateau / Figurines',icon:'🎲'},
+generic:{label:'Générique',icon:'🎲'}
+};
+function mkChar_DND5(){return{name:"Héros D&D 5e",pages:[
+{name:"Identité",panels:[
+{id:genId(),title:"Informations",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'text',label:'Nom',value:'Thorin Forgefeu',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Classe & Niveau',value:'Guerrier 5',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Race',value:'Nain des Montagnes',width:'33',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Background',value:'Soldat',width:'33',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Alignement',value:'Loyal Bon',width:'33',newLine:false,align:'center',color:'#555'}]},
+{id:genId(),title:"Combat",titleColor:"#c0392b",fields:[
+{id:genId(),type:'healthmax',label:'Points de Vie',value:52,max:52,width:'100',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'CA',value:18,min:1,max:30,width:'25',newLine:true,align:'center',color:'#1f618d'},
+{id:genId(),type:'number',label:'Init',value:2,min:-5,max:20,width:'25',newLine:false,align:'center',color:'#196f3d'},
+{id:genId(),type:'number',label:'Vitesse',value:7,min:0,max:60,width:'25',newLine:false,align:'center',color:'#7f8c8d'},
+{id:genId(),type:'number',label:'Bonus Maîtrise',value:3,min:0,max:6,width:'25',newLine:false,align:'center',color:'#8e44ad'},
+{id:genId(),type:'dots',label:'Dés de Vie (d10)',value:5,max:5,width:'100',newLine:true,align:'center',size:'4',color:'#c0392b'},
+{id:genId(),type:'status',label:'États',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Concentré',activeColor:'#3498db',active:false},
+{id:genId(),label:'Avantage',activeColor:'#27ae60',active:false},
+{id:genId(),label:'Désavantage',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Assourdi',activeColor:'#7f8c8d',active:false},
+{id:genId(),label:'Empoisonné',activeColor:'#27ae60',active:false}]}]},
+{id:genId(),title:"Inspirations & Ressources",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'dots',label:'Inspiration',value:0,max:1,width:'33',newLine:true,align:'center',size:'4',color:'#f1c40f'},
+{id:genId(),type:'number',label:'PV Temp.',value:0,min:0,max:50,width:'33',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Mort Succ.',value:0,min:0,max:3,width:'33',newLine:false,align:'center',color:'#c0392b'}]}]},
+{name:"Caract.",panels:[
+{id:genId(),title:"Caractéristiques",titleColor:"#2980b9",fields:[
+{id:genId(),type:'number',label:'FOR',value:18,min:1,max:30,width:'33',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'DEX',value:12,min:1,max:30,width:'33',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'CON',value:16,min:1,max:30,width:'33',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'INT',value:10,min:1,max:30,width:'33',newLine:true,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'SAG',value:13,min:1,max:30,width:'33',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'CHA',value:8,min:1,max:30,width:'33',newLine:false,align:'center',color:'#f1c40f'}]},
+{id:genId(),title:"Jets de Sauvegarde",titleColor:"#27ae60",fields:[
+{id:genId(),type:'number',label:'FOR',value:7,min:-5,max:20,width:'25',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'DEX',value:1,min:-5,max:20,width:'25',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'CON',value:6,min:-5,max:20,width:'25',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'INT',value:0,min:-5,max:20,width:'25',newLine:false,align:'center',color:'#3498db'}]},
+{id:genId(),title:"Compétences clés",titleColor:"#34495e",fields:[
+{id:genId(),type:'number',label:'Athlétisme',value:7,min:-5,max:20,width:'33',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Perception',value:4,min:-5,max:20,width:'33',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Intimidation',value:2,min:-5,max:20,width:'33',newLine:false,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Survie',value:4,min:-5,max:20,width:'33',newLine:true,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Histoire',value:3,min:-5,max:20,width:'33',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Persuasion',value:-1,min:-5,max:20,width:'33',newLine:false,align:'center',color:'#f1c40f'}]}]},
+{name:"Combat",panels:[
+{id:genId(),title:"Dés de Combat",titleColor:"#c0392b",fields:[
+{id:genId(),type:'dice',label:'',value:0,width:'100',newLine:true,align:'center'}]},
+{id:genId(),title:"Capacités de Combat",titleColor:"#e74c3c",fields:[
+{id:genId(),type:'dots',label:'Attaque Supplémentaire (actions)',value:0,max:2,width:'50',newLine:true,align:'center',size:'4',color:'#e74c3c'},
+{id:genId(),type:'dots',label:'Second Souffle',value:0,max:1,width:'50',newLine:false,align:'center',size:'4',color:'#27ae60'},
+{id:genId(),type:'dots',label:'Action Bonus',value:0,max:1,width:'100',newLine:true,align:'center',size:'4',color:'#3498db'}]},
+{id:genId(),title:"Équipement",titleColor:"#7f8c8d",fields:[
+{id:genId(),type:'text',label:'Arme principale',value:'Hache de Bataille +1 (1d8+5)',width:'100',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Arme secondaire',value:'Arbalète légère (1d8+1)',width:'100',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'number',label:'PO',value:145,min:0,max:9999,width:'33',newLine:true,align:'center',color:'#f1c40f'},
+{id:genId(),type:'number',label:'PA',value:30,min:0,max:9999,width:'33',newLine:false,align:'center',color:'#7f8c8d'},
+{id:genId(),type:'number',label:'PC',value:0,min:0,max:9999,width:'33',newLine:false,align:'center',color:'#e67e22'}]}]},
+{name:"Notes",panels:[
+{id:genId(),title:"Traits & Background",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'textarea',label:'Traits de personnalité',value:'Courageux et têtu, je ne recule jamais.',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:60,bgColor:'transparent'},
+{id:genId(),type:'textarea',label:'Idéaux',value:"L'honneur avant tout.",width:'100',newLine:true,align:'center',color:'#1a1a1a',height:60,bgColor:'transparent'},
+{id:genId(),type:'textarea',label:'Liens',value:'Protéger mon clan.',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:60,bgColor:'transparent'}]},
+{id:genId(),title:"Langues & Maîtrises",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'textarea',label:'',value:'Commun, Nain. Armures lourdes, toutes armes. Outils de forgeron.',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:70,bgColor:'transparent'}]}]}
+]}}
+function mkChar_COC(){return{name:"Investigateur CoC",pages:[
+{name:"Profil",panels:[
+{id:genId(),title:"Identité",titleColor:"#4a3728",fields:[
+{id:genId(),type:'text',label:'Nom',value:'Eleanor Voss',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Occupation',value:'Journaliste',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Résidence',value:'Arkham, 1925',width:'50',newLine:true,align:'center',color:'#555'},
+{id:genId(),type:'text',label:'Âge',value:'32',width:'25',newLine:false,align:'center',color:'#555'},
+{id:genId(),type:'text',label:'Genre',value:'F',width:'25',newLine:false,align:'center',color:'#555'}]},
+{id:genId(),title:"Santé & Sanité",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'healthmax',label:'Points de Vie',value:12,max:12,width:'50',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'healthmax',label:'Sanité',value:65,max:65,width:'50',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Sanité Max',value:99,min:0,max:99,width:'33',newLine:true,align:'center',color:'#8e44ad'},
+{id:genId(),type:'number',label:'Magie',value:13,min:0,max:30,width:'33',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Chance',value:55,min:0,max:100,width:'33',newLine:false,align:'center',color:'#f1c40f'},
+{id:genId(),type:'status',label:'État mental',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Phobie',activeColor:'#9b59b6',active:false},
+{id:genId(),label:'Manie',activeColor:'#e74c3c',active:false},
+{id:genId(),label:'Insane temporaire',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Inconscient',activeColor:'#7f8c8d',active:false}]}]}]},
+{name:"Attributs",panels:[
+{id:genId(),title:"Caractéristiques",titleColor:"#4a3728",fields:[
+{id:genId(),type:'number',label:'FOR',value:50,min:1,max:100,width:'25',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'CON',value:60,min:1,max:100,width:'25',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'TAI',value:55,min:1,max:100,width:'25',newLine:false,align:'center',color:'#f39c12'},
+{id:genId(),type:'number',label:'DEX',value:70,min:1,max:100,width:'25',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'APP',value:65,min:1,max:100,width:'25',newLine:true,align:'center',color:'#f1c40f'},
+{id:genId(),type:'number',label:'INT',value:75,min:1,max:100,width:'25',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'POW',value:65,min:1,max:100,width:'25',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'ÉDU',value:80,min:1,max:100,width:'25',newLine:false,align:'center',color:'#1abc9c'}]},
+{id:genId(),title:"Valeurs dérivées",titleColor:"#7f8c8d",fields:[
+{id:genId(),type:'number',label:'Mod Dég.',value:0,min:-2,max:5,width:'33',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Carrure',value:0,min:-2,max:5,width:'33',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'Mouvement',value:8,min:0,max:15,width:'33',newLine:false,align:'center',color:'#27ae60'}]}]},
+{name:"Compétences",panels:[
+{id:genId(),title:"Compétences de Combat",titleColor:"#c0392b",fields:[
+{id:genId(),type:'number',label:'Mêlée',value:25,min:0,max:100,width:'33',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Armes à feu',value:35,min:0,max:100,width:'33',newLine:false,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Esquive',value:35,min:0,max:100,width:'33',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'dice',label:'Dés',value:0,width:'100',newLine:true,align:'center'}]},
+{id:genId(),title:"Compétences d'Investigation",titleColor:"#3498db",fields:[
+{id:genId(),type:'number',label:'Bibliothèque',value:55,min:0,max:100,width:'33',newLine:true,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Pistage',value:20,min:0,max:100,width:'33',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Discrétion',value:35,min:0,max:100,width:'33',newLine:false,align:'center',color:'#7f8c8d'},
+{id:genId(),type:'number',label:'Médecine',value:15,min:0,max:100,width:'33',newLine:true,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Occultisme',value:15,min:0,max:100,width:'33',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Psychologie',value:50,min:0,max:100,width:'33',newLine:false,align:'center',color:'#f39c12'}]},
+{id:genId(),title:"Compétences Sociales",titleColor:"#9b59b6",fields:[
+{id:genId(),type:'number',label:'Persuasion',value:45,min:0,max:100,width:'33',newLine:true,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Intimidation',value:30,min:0,max:100,width:'33',newLine:false,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Charme',value:45,min:0,max:100,width:'33',newLine:false,align:'center',color:'#f1c40f'}]}]},
+{name:"Notes",panels:[
+{id:genId(),title:"Carnet d'enquête",titleColor:"#4a3728",fields:[
+{id:genId(),type:'textarea',label:'Indices',value:'',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:100,bgColor:'transparent'},
+{id:genId(),type:'textarea',label:'Contacts & PNJ',value:'',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:80,bgColor:'transparent'}]},
+{id:genId(),title:"Équipement & Objets clés",titleColor:"#7f8c8d",fields:[
+{id:genId(),type:'checklist-v',label:'',items:[{id:genId(),label:'Revolver .38',checked:false},{id:genId(),label:'Lampe de poche',checked:false},{id:genId(),label:'Carnet et stylo',checked:false},{id:genId(),label:'Trousse de premiers secours',checked:false},{id:genId(),label:'$50 en liquide',checked:false}],width:'100',newLine:true,color:'#27ae60'}]}]}
+]}}
+function mkChar_PF2(){return{name:"Héros Pathfinder 2",pages:[
+{name:"Principal",panels:[
+{id:genId(),title:"Identité",titleColor:"#8b0000",fields:[
+{id:genId(),type:'text',label:'Nom',value:'Serafina Aldori',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Classe',value:'Guerrière 5',width:'25',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Ancestry',value:'Humaine',width:'25',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Background',value:'Garde du corps',width:'50',newLine:true,align:'center',color:'#555'},
+{id:genId(),type:'text',label:'Héritage',value:'Versatile',width:'50',newLine:false,align:'center',color:'#555'}]},
+{id:genId(),title:"Vitalité & Défense",titleColor:"#c0392b",fields:[
+{id:genId(),type:'healthmax',label:'Points de Vie',value:75,max:75,width:'100',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'CA',value:22,min:1,max:50,width:'25',newLine:true,align:'center',color:'#1f618d'},
+{id:genId(),type:'number',label:'CA Armure',value:4,min:0,max:20,width:'25',newLine:false,align:'center',color:'#2980b9'},
+{id:genId(),type:'number',label:'Init',value:3,min:-5,max:20,width:'25',newLine:false,align:'center',color:'#196f3d'},
+{id:genId(),type:'number',label:'Perception',value:8,min:-5,max:30,width:'25',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'PV Temp.',value:0,min:0,max:50,width:'50',newLine:true,align:'center',color:'#27ae60'},
+{id:genId(),type:'dots',label:'Actions',value:0,max:3,width:'50',newLine:false,align:'center',size:'4',color:'#e74c3c'}]},
+{id:genId(),title:"Jets de Sauvegarde",titleColor:"#27ae60",fields:[
+{id:genId(),type:'number',label:'Vigueur',value:12,min:-5,max:30,width:'33',newLine:true,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'Réflexes',value:9,min:-5,max:30,width:'33',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Volonté',value:7,min:-5,max:30,width:'33',newLine:false,align:'center',color:'#9b59b6'}]}]},
+{name:"Attributs",panels:[
+{id:genId(),title:"Scores d'Attributs",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'number',label:'FOR',value:18,min:1,max:30,width:'33',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'DEX',value:14,min:1,max:30,width:'33',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'CON',value:16,min:1,max:30,width:'33',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'INT',value:12,min:1,max:30,width:'33',newLine:true,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'SAG',value:13,min:1,max:30,width:'33',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'CHA',value:10,min:1,max:30,width:'33',newLine:false,align:'center',color:'#f1c40f'}]},
+{id:genId(),title:"Points de Héros",titleColor:"#f39c12",fields:[
+{id:genId(),type:'ring',label:'Héros',value:1,max:3,color:'#f39c12',ringSize:110,width:'auto',newLine:true,align:'center'},
+{id:genId(),type:'number',label:'Focus',value:3,min:0,max:10,width:'auto',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Résonance',value:8,min:0,max:20,width:'auto',newLine:false,align:'center',color:'#3498db'}]}]},
+{name:"Combat",panels:[
+{id:genId(),title:"Dés de Combat",titleColor:"#c0392b",fields:[
+{id:genId(),type:'dice',label:'',value:0,width:'100',newLine:true,align:'center'}]},
+{id:genId(),title:"Maîtrises d'Armes",titleColor:"#e74c3c",fields:[
+{id:genId(),type:'squares',label:'Épée longue',value:3,max:4,width:'50',newLine:true,align:'center',size:'3',color:'#e74c3c'},
+{id:genId(),type:'squares',label:'Bouclier',value:2,max:4,width:'50',newLine:false,align:'center',size:'3',color:'#3498db'},
+{id:genId(),type:'squares',label:'Arcs',value:1,max:4,width:'50',newLine:true,align:'center',size:'3',color:'#27ae60'},
+{id:genId(),type:'squares',label:'Mains nues',value:2,max:4,width:'50',newLine:false,align:'center',size:'3',color:'#e67e22'}]},
+{id:genId(),title:"États de Combat",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'status',label:'',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Saisi',activeColor:'#9b59b6',active:false},
+{id:genId(),label:'Aplati',activeColor:'#7f8c8d',active:false},
+{id:genId(),label:'Vacillant',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Effrayé',activeColor:'#e74c3c',active:false},
+{id:genId(),label:'Béni',activeColor:'#f1c40f',active:false}]}]}]}
+]}}
+function mkChar_Vampire(){return{name:"Kindred V5",pages:[
+{name:"Attributs",panels:[
+{id:genId(),title:"Identité",titleColor:"#8e0000",fields:[
+{id:genId(),type:'text',label:'Nom',value:'Viktor Nocturne',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Clan',value:'Ventrue',width:'25',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'text',label:'Génération',value:'9ème',width:'25',newLine:false,align:'center',color:'#c0392b'}]},
+{id:genId(),title:"Attributs Physiques",titleColor:"#c0392b",fields:[
+{id:genId(),type:'dots',label:'Force',value:3,max:5,width:'33',newLine:true,align:'center',size:'4',color:'#c0392b'},
+{id:genId(),type:'dots',label:'Dextérité',value:2,max:5,width:'33',newLine:false,align:'center',size:'4',color:'#c0392b'},
+{id:genId(),type:'dots',label:'Vigueur',value:3,max:5,width:'33',newLine:false,align:'center',size:'4',color:'#c0392b'}]},
+{id:genId(),title:"Attributs Sociaux",titleColor:"#9b59b6",fields:[
+{id:genId(),type:'dots',label:'Charisme',value:4,max:5,width:'33',newLine:true,align:'center',size:'4',color:'#9b59b6'},
+{id:genId(),type:'dots',label:'Manipulation',value:3,max:5,width:'33',newLine:false,align:'center',size:'4',color:'#9b59b6'},
+{id:genId(),type:'dots',label:'Prestance',value:2,max:5,width:'33',newLine:false,align:'center',size:'4',color:'#9b59b6'}]},
+{id:genId(),title:"Attributs Mentaux",titleColor:"#3498db",fields:[
+{id:genId(),type:'dots',label:'Perception',value:2,max:5,width:'33',newLine:true,align:'center',size:'4',color:'#3498db'},
+{id:genId(),type:'dots',label:'Intelligence',value:3,max:5,width:'33',newLine:false,align:'center',size:'4',color:'#3498db'},
+{id:genId(),type:'dots',label:'Astuce',value:3,max:5,width:'33',newLine:false,align:'center',size:'4',color:'#3498db'}]}]},
+{name:"Ressources",panels:[
+{id:genId(),title:"Vitalité & Faim",titleColor:"#8e0000",fields:[
+{id:genId(),type:'ring',label:'Vitalité',value:7,max:10,color:'#c0392b',ringSize:80,width:'50',newLine:true,align:'center'},
+{id:genId(),type:'dots',label:'Faim',value:1,max:5,width:'50',newLine:false,align:'center',size:'4',color:'#8e0000'},
+{id:genId(),type:'dots',label:'Volonté',value:6,max:10,width:'100',newLine:true,align:'center',size:'4',color:'#f39c12'}]},
+{id:genId(),title:"Humanité & Ambition",titleColor:"#9b59b6",fields:[
+{id:genId(),type:'ring',label:'Humanité',value:6,max:10,color:'#9b59b6',ringSize:80,width:'50',newLine:true,align:'center'},
+{id:genId(),type:'dots',label:'Ambition',value:3,max:5,width:'50',newLine:false,align:'center',size:'4',color:'#3498db'}]},
+{id:genId(),title:"États",titleColor:"#c0392b",fields:[
+{id:genId(),type:'status',label:'',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Frénésie',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Bestialité',activeColor:'#8e0000',active:false},
+{id:genId(),label:'Étourdissement',activeColor:'#7f8c8d',active:false},
+{id:genId(),label:'Rêve de Sang',activeColor:'#9b59b6',active:false}]}]}]},
+{name:"Disciplines",panels:[
+{id:genId(),title:"Disciplines Ventrue",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'dots',label:'Domination',value:3,max:5,width:'33',newLine:true,align:'center',size:'4',color:'#9b59b6'},
+{id:genId(),type:'dots',label:'Fortitude',value:2,max:5,width:'33',newLine:false,align:'center',size:'4',color:'#e67e22'},
+{id:genId(),type:'dots',label:'Présence',value:1,max:5,width:'33',newLine:false,align:'center',size:'4',color:'#f1c40f'}]},
+{id:genId(),title:"Pouvoirs actifs",titleColor:"#c0392b",fields:[
+{id:genId(),type:'checklist-v',label:'',items:[
+{id:genId(),label:'Regard Persistant (Domination 1)',checked:false},
+{id:genId(),label:'Mésuser (Domination 2)',checked:false},
+{id:genId(),label:'Témérité (Fortitude 1)',checked:false},
+{id:genId(),label:'Aura de Terreur (Présence 1)',checked:false}
+],width:'100',newLine:true,color:'#9b59b6'}]}]},
+{name:"Compétences",panels:[
+{id:genId(),title:"Compétences Physiques",titleColor:"#c0392b",fields:[
+{id:genId(),type:'dots',label:'Athlétisme',value:2,max:5,width:'25',newLine:true,align:'center',size:'3',color:'#c0392b'},
+{id:genId(),type:'dots',label:'Combat',value:3,max:5,width:'25',newLine:false,align:'center',size:'3',color:'#c0392b'},
+{id:genId(),type:'dots',label:'Discrétion',value:2,max:5,width:'25',newLine:false,align:'center',size:'3',color:'#c0392b'},
+{id:genId(),type:'dots',label:'Conduite',value:1,max:5,width:'25',newLine:false,align:'center',size:'3',color:'#c0392b'}]},
+{id:genId(),title:"Compétences Sociales",titleColor:"#9b59b6",fields:[
+{id:genId(),type:'dots',label:'Etiquette',value:3,max:5,width:'25',newLine:true,align:'center',size:'3',color:'#9b59b6'},
+{id:genId(),type:'dots',label:'Intimidation',value:2,max:5,width:'25',newLine:false,align:'center',size:'3',color:'#9b59b6'},
+{id:genId(),type:'dots',label:'Leadership',value:3,max:5,width:'25',newLine:false,align:'center',size:'3',color:'#9b59b6'},
+{id:genId(),type:'dots',label:'Persuasion',value:4,max:5,width:'25',newLine:false,align:'center',size:'3',color:'#9b59b6'}]}]}
+]}}
+function mkChar_Shadowrun(){return{name:"Runner SR6",pages:[
+{name:"Identité",panels:[
+{id:genId(),title:"Profil",titleColor:"#1a1a2e",fields:[
+{id:genId(),type:'text',label:'Nom de rue',value:'Ghost',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Archétype',value:'Pistolero',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Métatype',value:'Humain',width:'33',newLine:true,align:'center',color:'#555'},
+{id:genId(),type:'text',label:'Éthnicité',value:'—',width:'33',newLine:false,align:'center',color:'#555'},
+{id:genId(),type:'number',label:'Karma Total',value:45,min:0,max:999,width:'33',newLine:false,align:'center',color:'#f1c40f'}]},
+{id:genId(),title:"Moniteurs de Dommages",titleColor:"#c0392b",fields:[
+{id:genId(),type:'healthmax',label:'Dommages Physiques',value:10,max:10,width:'50',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'healthmax',label:'Dommages Étourdissants',value:10,max:10,width:'50',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'status',label:'États',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'En fuite',activeColor:'#e74c3c',active:false},
+{id:genId(),label:'En couverture',activeColor:'#27ae60',active:false},
+{id:genId(),label:'Blessé grave',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Jacked in',activeColor:'#3498db',active:false},
+{id:genId(),label:'Incognito',activeColor:'#7f8c8d',active:false}]}]}]},
+{name:"Attributs",panels:[
+{id:genId(),title:"Attributs Physiques",titleColor:"#e74c3c",fields:[
+{id:genId(),type:'number',label:'Corps',value:4,min:1,max:12,width:'25',newLine:true,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Agilité',value:6,min:1,max:12,width:'25',newLine:false,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Réaction',value:5,min:1,max:12,width:'25',newLine:false,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Force',value:4,min:1,max:12,width:'25',newLine:false,align:'center',color:'#e74c3c'}]},
+{id:genId(),title:"Attributs Mentaux",titleColor:"#3498db",fields:[
+{id:genId(),type:'number',label:'Logique',value:4,min:1,max:12,width:'25',newLine:true,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Intuition',value:5,min:1,max:12,width:'25',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Volonté',value:4,min:1,max:12,width:'25',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Charisme',value:3,min:1,max:12,width:'25',newLine:false,align:'center',color:'#3498db'}]},
+{id:genId(),title:"Attributs Spéciaux",titleColor:"#9b59b6",fields:[
+{id:genId(),type:'number',label:'Magie/Réso.',value:0,min:0,max:12,width:'33',newLine:true,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Essence',value:6,min:0,max:6,width:'33',newLine:false,align:'center',color:'#1abc9c'},
+{id:genId(),type:'number',label:'Edge',value:4,min:0,max:7,width:'33',newLine:false,align:'center',color:'#f1c40f'},
+{id:genId(),type:'dots',label:'Edge disponible',value:4,max:7,width:'100',newLine:true,align:'center',size:'4',color:'#f1c40f'}]}]},
+{name:"Combat",panels:[
+{id:genId(),title:"Dés de Combat",titleColor:"#e74c3c",fields:[
+{id:genId(),type:'dice',label:'',value:0,width:'100',newLine:true,align:'center'}]},
+{id:genId(),title:"Arsenal",titleColor:"#c0392b",fields:[
+{id:genId(),type:'text',label:'Arme 1',value:'Colt America L36 — DEX+Armes à feu',width:'100',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Arme 2',value:'Ares Predator VI — DEX+Armes à feu',width:'100',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'number',label:'Armure',value:12,min:0,max:20,width:'33',newLine:true,align:'center',color:'#7f8c8d'},
+{id:genId(),type:'number',label:'Esquive',value:9,min:0,max:20,width:'33',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Def. Nat.',value:0,min:0,max:10,width:'33',newLine:false,align:'center',color:'#e67e22'}]},
+{id:genId(),title:"Cyberware",titleColor:"#1abc9c",fields:[
+{id:genId(),type:'checklist-v',label:'',items:[
+{id:genId(),label:'Réflexes câblés 2 (−2 Essence)',checked:true},
+{id:genId(),label:'Œil cybernétique R3 (−0.3)',checked:true},
+{id:genId(),label:'Smartgun interne (−0.2)',checked:true},
+{id:genId(),label:'Armor subdermal (−0.5)',checked:false}
+],width:'100',newLine:true,color:'#1abc9c'}]}]},
+{name:"Compétences",panels:[
+{id:genId(),title:"Compétences de Combat",titleColor:"#e74c3c",fields:[
+{id:genId(),type:'number',label:'Armes à feu',value:8,min:0,max:20,width:'25',newLine:true,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Mêlée',value:5,min:0,max:20,width:'25',newLine:false,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Athlétisme',value:6,min:0,max:20,width:'25',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Discrétion',value:7,min:0,max:20,width:'25',newLine:false,align:'center',color:'#7f8c8d'}]},
+{id:genId(),title:"Compétences Techniques",titleColor:"#3498db",fields:[
+{id:genId(),type:'number',label:'Électronique',value:4,min:0,max:20,width:'25',newLine:true,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Mécanique',value:3,min:0,max:20,width:'25',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'Informatique',value:3,min:0,max:20,width:'25',newLine:false,align:'center',color:'#1abc9c'},
+{id:genId(),type:'number',label:'Médecine',value:2,min:0,max:20,width:'25',newLine:false,align:'center',color:'#e74c3c'}]}]}
+]}}
+function mkChar_Generic(){return{name:"Personnage Générique",pages:[
+{name:"Principal",panels:[
+{id:genId(),title:"Identité",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'text',label:'Nom',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Concept',value:'',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Faction',value:'',width:'50',newLine:true,align:'center',color:'#555'},
+{id:genId(),type:'text',label:'Spécialité',value:'',width:'50',newLine:false,align:'center',color:'#555'}]},
+{id:genId(),title:"Ressources",titleColor:"#27ae60",fields:[
+{id:genId(),type:'ring',label:'Vie',value:8,max:10,color:'#c0392b',ringSize:100,width:'33',newLine:true,align:'center'},
+{id:genId(),type:'ring',label:'Énergie',value:6,max:10,color:'#3498db',ringSize:100,width:'33',newLine:false,align:'center'},
+{id:genId(),type:'ring',label:'Moral',value:7,max:10,color:'#9b59b6',ringSize:100,width:'33',newLine:false,align:'center'}]}]},
+{name:"Attributs",panels:[
+{id:genId(),title:"Attributs Principaux",titleColor:"#2980b9",fields:[
+{id:genId(),type:'number',label:'Corps',value:10,min:1,max:30,width:'33',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Esprit',value:10,min:1,max:30,width:'33',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Âme',value:10,min:1,max:30,width:'33',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Agilité',value:10,min:1,max:30,width:'33',newLine:true,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Charisme',value:10,min:1,max:30,width:'33',newLine:false,align:'center',color:'#f1c40f'},
+{id:genId(),type:'number',label:'Chance',value:10,min:1,max:30,width:'33',newLine:false,align:'center',color:'#e67e22'}]},
+{id:genId(),title:"Compétences",titleColor:"#34495e",fields:[
+{id:genId(),type:'dots',label:'Compétence 1',value:2,max:5,width:'50',newLine:true,align:'center',size:'3',color:'#2c3e50'},
+{id:genId(),type:'dots',label:'Compétence 2',value:3,max:5,width:'50',newLine:false,align:'center',size:'3',color:'#2c3e50'},
+{id:genId(),type:'dots',label:'Compétence 3',value:1,max:5,width:'50',newLine:true,align:'center',size:'3',color:'#2c3e50'},
+{id:genId(),type:'dots',label:'Compétence 4',value:4,max:5,width:'50',newLine:false,align:'center',size:'3',color:'#2c3e50'}]},
+{id:genId(),title:"Dés",titleColor:"#c0392b",fields:[
+{id:genId(),type:'dice',label:'',value:0,width:'100',newLine:true,align:'center'}]}]},
+{name:"Notes",panels:[
+{id:genId(),title:"Description",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'textarea',label:'',value:'',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:100,bgColor:'transparent'}]},
+{id:genId(),title:"États",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'status',label:'',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Blessé',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Fatigué',activeColor:'#e67e22',active:false},
+{id:genId(),label:'Boosté',activeColor:'#27ae60',active:false},
+{id:genId(),label:'Maudit',activeColor:'#9b59b6',active:false}]}]}]}
+]}}
+function mkChar_SciFi(){return{name:"Explorateur Stellaire",pages:[
+{name:"Profil",panels:[
+{id:genId(),title:"Identité",titleColor:"#1a4a6b",fields:[
+{id:genId(),type:'text',label:'Nom',value:'Commander Elara Vasque',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Classe',value:'Officier de terrain',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Espèce',value:'Humaine améliorée',width:'33',newLine:true,align:'center',color:'#555'},
+{id:genId(),type:'text',label:'Faction',value:'Alliance Galactique',width:'33',newLine:false,align:'center',color:'#555'},
+{id:genId(),type:'number',label:'Rang',value:4,min:1,max:10,width:'33',newLine:false,align:'center',color:'#3498db'}]},
+{id:genId(),title:"Intégrité Physique",titleColor:"#c0392b",fields:[
+{id:genId(),type:'healthmax',label:'Points de Coque (PV)',value:28,max:28,width:'50',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'healthmax',label:'Boucliers',value:20,max:20,width:'50',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'ring',label:'Stress',value:3,max:10,color:'#9b59b6',ringSize:110,width:'33',newLine:true,align:'center'},
+{id:genId(),type:'number',label:'Défense',value:14,min:0,max:30,width:'33',newLine:false,align:'center',color:'#1f618d'},
+{id:genId(),type:'number',label:'Initiative',value:5,min:-5,max:20,width:'33',newLine:false,align:'center',color:'#196f3d'}]},
+{id:genId(),title:"États",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'status',label:'',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Combinaison pressurisée',activeColor:'#3498db',active:false},
+{id:genId(),label:'Camouflage actif',activeColor:'#7f8c8d',active:false},
+{id:genId(),label:'Alarme vaisseau',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Sous vide',activeColor:'#2980b9',active:false},
+{id:genId(),label:'Surcharge neurale',activeColor:'#9b59b6',active:false}]}]}]},
+{name:"Attributs",panels:[
+{id:genId(),title:"Attributs de Base",titleColor:"#2980b9",fields:[
+{id:genId(),type:'number',label:'Physique',value:14,min:1,max:20,width:'25',newLine:true,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Technique',value:12,min:1,max:20,width:'25',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Mental',value:15,min:1,max:20,width:'25',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Social',value:13,min:1,max:20,width:'25',newLine:false,align:'center',color:'#f39c12'}]},
+{id:genId(),title:"Compétences Spatiales",titleColor:"#1abc9c",fields:[
+{id:genId(),type:'number',label:'Pilotage',value:8,min:0,max:20,width:'33',newLine:true,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Armes à énergie',value:10,min:0,max:20,width:'33',newLine:false,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Survie exoplanète',value:6,min:0,max:20,width:'33',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Xénobiologie',value:7,min:0,max:20,width:'33',newLine:true,align:'center',color:'#1abc9c'},
+{id:genId(),type:'number',label:'Hacking',value:5,min:0,max:20,width:'33',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Médecine de terrain',value:8,min:0,max:20,width:'33',newLine:false,align:'center',color:'#e67e22'}]}]},
+{name:"Vaisseau",panels:[
+{id:genId(),title:"Vaisseau Personnel — UAS Nébuleuse",titleColor:"#1a4a6b",fields:[
+{id:genId(),type:'healthmax',label:'Coque',value:80,max:80,width:'50',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'healthmax',label:'Boucliers vaisseau',value:60,max:60,width:'50',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Carburant',value:8,min:0,max:10,width:'33',newLine:true,align:'center',color:'#f39c12'},
+{id:genId(),type:'number',label:'Munitions',value:24,min:0,max:50,width:'33',newLine:false,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Systèmes',value:3,min:0,max:5,width:'33',newLine:false,align:'center',color:'#1abc9c'}]},
+{id:genId(),title:"Dés de Combat Spatial",titleColor:"#c0392b",fields:[
+{id:genId(),type:'dice',label:'',value:0,width:'100',newLine:true,align:'center'}]}]},
+{name:"Notes",panels:[
+{id:genId(),title:"Mission en cours",titleColor:"#1a4a6b",fields:[
+{id:genId(),type:'textarea',label:'Objectifs',value:'',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:80,bgColor:'transparent'},
+{id:genId(),type:'checklist-v',label:'Tâches',items:[
+{id:genId(),label:'Rapport de terrain rendu',checked:false},
+{id:genId(),label:'Échantillons xéno collectés',checked:false},
+{id:genId(),label:'Contact local établi',checked:false}
+],width:'100',newLine:true,color:'#3498db'}]}]}
+]}}
+function mkChar_Horror(){return{name:"Survivant",pages:[
+{name:"Profil",panels:[
+{id:genId(),title:"Identité",titleColor:"#1a0a0a",fields:[
+{id:genId(),type:'text',label:'Nom',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Occupation avant',value:'',width:'50',newLine:false,align:'center',color:'#555'},
+{id:genId(),type:'text',label:'Lieu',value:'',width:'50',newLine:true,align:'center',color:'#555'},
+{id:genId(),type:'number',label:'Jours survivant',value:1,min:0,max:999,width:'50',newLine:false,align:'center',color:'#e67e22'}]},
+{id:genId(),title:"Santé & Sanité",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'ring',label:'PV',value:8,max:10,color:'#c0392b',ringSize:80,width:'33',newLine:true,align:'center'},
+{id:genId(),type:'ring',label:'Sanité',value:7,max:10,color:'#9b59b6',ringSize:80,width:'33',newLine:false,align:'center'},
+{id:genId(),type:'ring',label:'Vivres',value:5,max:10,color:'#e67e22',ringSize:80,width:'33',newLine:false,align:'center'},
+{id:genId(),type:'status',label:'',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Blessé',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Infecté',activeColor:'#27ae60',active:false},
+{id:genId(),label:'Traumatisé',activeColor:'#9b59b6',active:false},
+{id:genId(),label:'En panique',activeColor:'#e74c3c',active:false},
+{id:genId(),label:'Exténué',activeColor:'#7f8c8d',active:false},
+{id:genId(),label:'Caché',activeColor:'#34495e',active:false}]}]}]},
+{name:"Survie",panels:[
+{id:genId(),title:"Attributs de Survie",titleColor:"#8b0000",fields:[
+{id:genId(),type:'number',label:'Force',value:8,min:1,max:20,width:'25',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Agilité',value:9,min:1,max:20,width:'25',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Endurance',value:7,min:1,max:20,width:'25',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'Perception',value:10,min:1,max:20,width:'25',newLine:false,align:'center',color:'#9b59b6'}]},
+{id:genId(),title:"Inventaire & Ressources",titleColor:"#4a3728",fields:[
+{id:genId(),type:'checklist-v',label:'',items:[
+{id:genId(),label:'Couteau de survie',checked:true},
+{id:genId(),label:'Briquet (presque vide)',checked:true},
+{id:genId(),label:'Kit premiers secours',checked:false},
+{id:genId(),label:'Eau potable (2L)',checked:false},
+{id:genId(),label:'Torche électrique',checked:true},
+{id:genId(),label:'Munitions ×6',checked:false}
+],width:'100',newLine:true,color:'#e67e22'}]},
+{id:genId(),title:"Dés",titleColor:"#c0392b",fields:[
+{id:genId(),type:'dice',label:'',value:0,width:'100',newLine:true,align:'center'}]}]},
+{name:"Notes",panels:[
+{id:genId(),title:"Journal de survie",titleColor:"#1a0a0a",fields:[
+{id:genId(),type:'textarea',label:'',value:'Jour 1. Les rues sont vides...',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:150,bgColor:'transparent'}]}]}
+]}}
+// === NOUVEAUX TEMPLATES ===
+function mkChar_Warhammer(){return{name:"Héros WFRP",pages:[
+{name:"Profil",panels:[
+{id:genId(),title:"Identité",titleColor:"#8b2500",fields:[
+{id:genId(),type:'text',label:'Nom',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Carrière',value:'Garde de la Route',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Espèce',value:'Humain',width:'33',newLine:true,align:'center',color:'#555'},
+{id:genId(),type:'text',label:'Statut Social',value:'Argent 2',width:'33',newLine:false,align:'center',color:'#555'},
+{id:genId(),type:'number',label:'XP Total',value:150,min:0,max:9999,width:'33',newLine:false,align:'center',color:'#f1c40f'}]},
+{id:genId(),title:"Blessures & Résistance",titleColor:"#c0392b",fields:[
+{id:genId(),type:'healthmax',label:'Blessures',value:12,max:12,width:'50',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'ring',label:'Endurance',value:3,max:3,color:'#e67e22',ringSize:110,width:'50',newLine:false,align:'center'},
+{id:genId(),type:'status',label:'Conditions',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Étourdi',activeColor:'#7f8c8d',active:false},
+{id:genId(),label:'Étourdi grave',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Paralysé',activeColor:'#8e44ad',active:false},
+{id:genId(),label:'Saignant',activeColor:'#e74c3c',active:false},
+{id:genId(),label:'Sous l\'emprise',activeColor:'#9b59b6',active:false}]}]}]},
+{name:"Caract.",panels:[
+{id:genId(),title:"Caractéristiques",titleColor:"#8b2500",fields:[
+{id:genId(),type:'number',label:'CC',value:35,min:0,max:100,width:'25',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'CT',value:30,min:0,max:100,width:'25',newLine:false,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'F',value:35,min:0,max:100,width:'25',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'E',value:40,min:0,max:100,width:'25',newLine:false,align:'center',color:'#f39c12'},
+{id:genId(),type:'number',label:'Ag',value:35,min:0,max:100,width:'25',newLine:true,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Int',value:30,min:0,max:100,width:'25',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'FM',value:25,min:0,max:100,width:'25',newLine:false,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Soc',value:30,min:0,max:100,width:'25',newLine:false,align:'center',color:'#f1c40f'}]},
+{id:genId(),title:"Dés",titleColor:"#8b2500",fields:[
+{id:genId(),type:'dice',label:'',value:0,width:'100',newLine:true,align:'center'}]}]}
+]}}
+function mkChar_Starwars(){return{name:"Héros Star Wars D6",pages:[
+{name:"Profil",panels:[
+{id:genId(),title:"Identité",titleColor:"#1a1a4e",fields:[
+{id:genId(),type:'text',label:'Nom',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Espèce',value:'Humain',width:'25',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Profession',value:'Contrebandier',width:'25',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Affiliation',value:'Alliance Rebelle',width:'50',newLine:true,align:'center',color:'#555'}]},
+{id:genId(),title:"Santé",titleColor:"#3498db",fields:[
+{id:genId(),type:'healthmax',label:'Points de Vie',value:25,max:25,width:'50',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'ring',label:'Force',value:3,max:6,color:'#f1c40f',ringSize:110,width:'25',newLine:false,align:'center'},
+{id:genId(),type:'ring',label:'Côté Obscur',value:0,max:10,color:'#9b59b6',ringSize:110,width:'25',newLine:false,align:'center'}]}]},
+{name:"Attributs",panels:[
+{id:genId(),title:"Attributs (en dés)",titleColor:"#1a1a4e",fields:[
+{id:genId(),type:'number',label:'Dextérité',value:3,min:1,max:6,width:'33',newLine:true,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Connaissance',value:2,min:1,max:6,width:'33',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Mécanique',value:2,min:1,max:6,width:'33',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'Perception',value:3,min:1,max:6,width:'33',newLine:true,align:'center',color:'#9b59b6'},
+{id:genId(),type:'number',label:'Force',value:3,min:1,max:6,width:'33',newLine:false,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Technique',value:2,min:1,max:6,width:'33',newLine:false,align:'center',color:'#1abc9c'}]},
+{id:genId(),title:"Dés de Combat",titleColor:"#c0392b",fields:[
+{id:genId(),type:'dice',label:'',value:0,width:'100',newLine:true,align:'center'}]}]}
+]}}
+function mkChar_Ironsworn(){return{name:"Voyageur Ironsworn",pages:[
+{name:"Profil",panels:[
+{id:genId(),title:"Identité",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'text',label:'Nom',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Demeure',value:'',width:'50',newLine:false,align:'center',color:'#555'}]},
+{id:genId(),title:"Ressources",titleColor:"#c0392b",fields:[
+{id:genId(),type:'ring',label:'Santé',value:5,max:5,color:'#c0392b',ringSize:80,width:'25',newLine:true,align:'center'},
+{id:genId(),type:'ring',label:'Esprit',value:5,max:5,color:'#9b59b6',ringSize:80,width:'25',newLine:false,align:'center'},
+{id:genId(),type:'ring',label:'Élan',value:2,max:10,color:'#3498db',ringSize:80,width:'25',newLine:false,align:'center'},
+{id:genId(),type:'ring',label:'Ravitaillements',value:5,max:5,color:'#27ae60',ringSize:80,width:'25',newLine:false,align:'center'},
+{id:genId(),type:'dots',label:'Points de Carburant',value:0,max:6,width:'50',newLine:true,align:'center',size:'4',color:'#f39c12'},
+{id:genId(),type:'dots',label:'Blessures',value:0,max:3,width:'50',newLine:false,align:'center',size:'4',color:'#c0392b'}]}]},
+{name:"Attributs",panels:[
+{id:genId(),title:"Stats",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'number',label:'Cœur',value:2,min:0,max:4,width:'20',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Ombre',value:1,min:0,max:4,width:'20',newLine:false,align:'center',color:'#34495e'},
+{id:genId(),type:'number',label:'Fer',value:3,min:0,max:4,width:'20',newLine:false,align:'center',color:'#7f8c8d'},
+{id:genId(),type:'number',label:'Instinct',value:2,min:0,max:4,width:'20',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Sagesse',value:1,min:0,max:4,width:'20',newLine:false,align:'center',color:'#9b59b6'}]},
+{id:genId(),title:"Dés d'Action",titleColor:"#c0392b",fields:[
+{id:genId(),type:'dice',label:'',value:0,width:'100',newLine:true,align:'center'}]}]},
+{name:"Serments",panels:[
+{id:genId(),title:"Serments actifs",titleColor:"#c0392b",fields:[
+{id:genId(),type:'checklist-v',label:'',items:[
+{id:genId(),label:'Serment 1 — (Épique)',checked:false},
+{id:genId(),label:'Serment 2 — (Dangereux)',checked:false}
+],width:'100',newLine:true,color:'#c0392b'}]},
+{id:genId(),title:"Avancées",titleColor:"#f39c12",fields:[
+{id:genId(),type:'dots',label:'Expérience gagnée',value:2,max:30,width:'100',newLine:true,align:'center',size:'3',color:'#f39c12'}]}]}
+]}}
+function mkChar(name='Aventurier'){return mkChar_Showcase(name);}
+function mkChar_Showcase(name='Aventurier'){return{name,pages:[
+{name:"Combat",panels:[
+{id:genId(),title:"Points de Vie & Défense",titleColor:"#c0392b",fields:[
+{id:genId(),type:'healthmax',label:'Points de Vie',value:42,max:42,width:'50',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'ring',label:'Armure',value:5,max:10,color:'#1f618d',ringSize:70,width:'25',newLine:false,align:'center'},
+{id:genId(),type:'ring',label:'Magie',value:7,max:10,color:'#9b59b6',ringSize:70,width:'25',newLine:false,align:'center'},
+{id:genId(),type:'status',label:'États de combat',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Concentré',activeColor:'#3498db',active:false},
+{id:genId(),label:'Blessé',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Empoisonné',activeColor:'#27ae60',active:false},
+{id:genId(),label:'Maudit',activeColor:'#9b59b6',active:false},
+{id:genId(),label:'Béni',activeColor:'#f1c40f',active:false}]}]},
+{id:genId(),title:"Lancer de Dés",titleColor:"#e74c3c",fields:[
+{id:genId(),type:'dice',label:'',value:0,width:'100',newLine:true,align:'center'}]}]},
+{name:"Attributs",panels:[
+{id:genId(),title:"Statistiques (Nombres)",titleColor:"#2980b9",fields:[
+{id:genId(),type:'number',label:'Force',value:16,min:1,max:30,width:'25',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Dextérité',value:14,min:1,max:30,width:'25',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Constitution',value:15,min:1,max:30,width:'25',newLine:false,align:'center',color:'#e67e22'},
+{id:genId(),type:'number',label:'Intelligence',value:12,min:1,max:30,width:'25',newLine:false,align:'center',color:'#3498db'}]},
+{id:genId(),title:"Compétences (Points)",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'dots',label:'Épée',value:4,max:5,width:'33',newLine:true,align:'center',size:'4',color:'#c0392b'},
+{id:genId(),type:'dots',label:'Magie',value:2,max:5,width:'33',newLine:false,align:'center',size:'4',color:'#9b59b6'},
+{id:genId(),type:'dots',label:'Furtivité',value:3,max:5,width:'33',newLine:false,align:'center',size:'4',color:'#34495e'}]},
+{id:genId(),title:"Maîtrises (Carrés)",titleColor:"#27ae60",fields:[
+{id:genId(),type:'squares',label:'Combat Armé',value:3,max:4,width:'33',newLine:true,align:'center',size:'3',color:'#c0392b'},
+{id:genId(),type:'squares',label:'Magie Arcane',value:2,max:4,width:'33',newLine:false,align:'center',size:'3',color:'#9b59b6'},
+{id:genId(),type:'squares',label:'Survie',value:4,max:4,width:'33',newLine:false,align:'center',size:'3',color:'#27ae60'}]},
+{id:genId(),title:"Ressources (Anneaux)",titleColor:"#3498db",fields:[
+{id:genId(),type:'ring',label:'Stamina',value:8,max:10,color:'#e74c3c',ringSize:80,width:'33',newLine:true,align:'center'},
+{id:genId(),type:'ring',label:'Mana',value:6,max:10,color:'#9b59b6',ringSize:80,width:'33',newLine:false,align:'center'},
+{id:genId(),type:'ring',label:'Moral',value:9,max:10,color:'#f1c40f',ringSize:80,width:'33',newLine:false,align:'center'}]}]},
+{name:"Équipement",panels:[
+{id:genId(),title:"Inventaire (Checklist)",titleColor:"#7f8c8d",fields:[
+{id:genId(),type:'checklist-v',label:'',items:[
+{id:genId(),label:'Épée longue +2',checked:true},
+{id:genId(),label:'Armure de plates',checked:true},
+{id:genId(),label:'Potion de soin (×3)',checked:false},
+{id:genId(),label:'Torche (×5)',checked:true},
+{id:genId(),label:'Corde de soie (15m)',checked:false},
+{id:genId(),label:'Parchemin de Boule de Feu',checked:false}
+],width:'50',newLine:true,color:'#27ae60'},
+{id:genId(),type:'checklist-h',label:'Quêtes actives',items:[
+{id:genId(),label:'Trouver la grotte',checked:false},
+{id:genId(),label:'Éliminer le dragon',checked:false},
+{id:genId(),label:'Rapport au roi',checked:false}
+],width:'50',newLine:false,color:'#f39c12'}]},
+{id:genId(),title:"Textes",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'text',label:'Arme équipée',value:'Épée longue +2 (1d8+5)',width:'100',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'textarea',label:'Notes de campagne',value:'Rencontre avec le dragon confirmée pour jeudi...',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:80,bgColor:'transparent'}]}]},
+{name:"Identité",panels:[
+{id:genId(),title:"Informations du Personnage",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'text',label:'Nom',value:name,width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Race & Classe',value:'Elfe Guerrier',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Alignement',value:'Chaotique Bon',width:'33',newLine:true,align:'center',color:'#555'},
+{id:genId(),type:'text',label:'Divinité',value:'Corellon',width:'33',newLine:false,align:'center',color:'#555'},
+{id:genId(),type:'number',label:'Niveau',value:7,min:1,max:20,width:'33',newLine:false,align:'center',color:'#f39c12'}]},
+{id:genId(),title:"Histoire & Traits",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'textarea',label:'Historique',value:'Né dans les forêts de Sylvandor, formé par les anciens maîtres elfes...',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:100,bgColor:'transparent'},
+{id:genId(),type:'textarea',label:'Traits de personnalité',value:'Courageux mais impulsif. Loyal envers ses alliés.',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:60,bgColor:'transparent'}]}]}
+]}}
+/* === TEMPLATES JEU DE PLATEAU / FIGURINES === */
+function mkChar_Zombicide(){return{name:"Survivant Zombicide",pages:[
+{name:"Fiche",panels:[
+{id:genId(),title:"Identité",titleColor:"#e74c3c",fields:[
+{id:genId(),type:'text',label:'Nom',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Classe',value:'Combattant',width:'50',newLine:false,align:'center',color:'#555'}]},
+{id:genId(),title:"Niveau de Danger",titleColor:"#e74c3c",fields:[
+{id:genId(),type:'ring',label:'Niveau',value:1,max:4,color:'#e74c3c',ringSize:110,width:'33',newLine:true,align:'center'},
+{id:genId(),type:'dots',label:'XP',value:0,max:43,width:'66',newLine:false,align:'center',size:'4',color:'#f39c12'},
+{id:genId(),type:'status',label:'Zone de danger',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'🟦 Bleu (0-6 XP)',activeColor:'#3498db',active:true},
+{id:genId(),label:'🟡 Jaune (7-18 XP)',activeColor:'#f1c40f',active:false},
+{id:genId(),label:'🟠 Orange (19-42 XP)',activeColor:'#e67e22',active:false},
+{id:genId(),label:'🔴 Rouge (43+ XP)',activeColor:'#c0392b',active:false}]}]},
+{id:genId(),title:"Santé & Actions",titleColor:"#c0392b",fields:[
+{id:genId(),type:'dots',label:'Points de Vie',value:3,max:3,width:'50',newLine:true,align:'center',size:'4',color:'#c0392b'},
+{id:genId(),type:'dots',label:'Actions / tour',value:1,max:3,width:'50',newLine:false,align:'center',size:'4',color:'#3498db'}]},
+{id:genId(),title:"Équipement & Inventaire",titleColor:"#7f8c8d",fields:[
+{id:genId(),type:'text',label:'Main Gauche',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Main Droite',value:'',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'checklist-h',label:'Objets portés',items:[
+{id:genId(),label:'Slot 1',checked:false},{id:genId(),label:'Slot 2',checked:false},
+{id:genId(),label:'Slot 3',checked:false},{id:genId(),label:'Slot 4',checked:false}
+],width:'100',newLine:true,color:'#27ae60'}]},
+{id:genId(),title:"Capacités débloquées",titleColor:"#9b59b6",fields:[
+{id:genId(),type:'checklist-v',label:'',items:[
+{id:genId(),label:'Bleu : +1 Action',checked:false},
+{id:genId(),label:'Bleu : Compétence spéciale',checked:false},
+{id:genId(),label:'Jaune : +1 Dé attaque',checked:false},
+{id:genId(),label:'Jaune : Compétence avancée',checked:false},
+{id:genId(),label:'Orange : Compétence élite',checked:false}
+],width:'100',newLine:true,color:'#9b59b6'}]}]}
+]}}
+function mkChar_Gloomhaven(){return{name:"Mercenaire Gloomhaven",pages:[
+{name:"Profil",panels:[
+{id:genId(),title:"Identité",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'text',label:'Nom',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Classe',value:'Brute',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'number',label:'Niveau',value:1,min:1,max:9,width:'25',newLine:true,align:'center',color:'#f39c12'},
+{id:genId(),type:'number',label:'PX Total',value:0,min:0,max:500,width:'33',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Or',value:30,min:0,max:999,width:'33',newLine:false,align:'center',color:'#f1c40f'}]},
+{id:genId(),title:"Santé & Ressources",titleColor:"#c0392b",fields:[
+{id:genId(),type:'ring',label:'PV',value:10,max:10,color:'#c0392b',ringSize:90,width:'33',newLine:true,align:'center'},
+{id:genId(),type:'ring',label:'Main (cartes)',value:9,max:12,color:'#3498db',ringSize:90,width:'33',newLine:false,align:'center'},
+{id:genId(),type:'ring',label:'Expérience',value:0,max:45,color:'#f39c12',ringSize:90,width:'33',newLine:false,align:'center'},
+{id:genId(),type:'status',label:'',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Immobilisé',activeColor:'#3498db',active:false},
+{id:genId(),label:'Étourdi',activeColor:'#e67e22',active:false},
+{id:genId(),label:'Empoisonné',activeColor:'#27ae60',active:false},
+{id:genId(),label:'Blessé',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Fortifié',activeColor:'#f1c40f',active:false},
+{id:genId(),label:'Invisible',activeColor:'#7f8c8d',active:false}]}]},
+{id:genId(),title:"Cartes Long Repos / Court Repos",titleColor:"#9b59b6",fields:[
+{id:genId(),type:'dots',label:'Cartes perdues',value:0,max:12,width:'100',newLine:true,align:'center',size:'3',color:'#c0392b'},
+{id:genId(),type:'dots',label:'Jetons éléments',value:0,max:6,width:'100',newLine:true,align:'center',size:'4',color:'#f39c12'}]}]},
+{name:"Quêtes",panels:[
+{id:genId(),title:"Quête personnelle",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'textarea',label:'Objectif',value:'',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:60,bgColor:'transparent'},
+{id:genId(),type:'dots',label:'Progression',value:0,max:10,width:'100',newLine:true,align:'center',size:'3',color:'#9b59b6'}]},
+{id:genId(),title:"Capacités permanentes",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'checklist-v',label:'',items:[
+{id:genId(),label:'Amélioration carte 1',checked:false},
+{id:genId(),label:'Amélioration carte 2',checked:false},
+{id:genId(),label:'Objet passif équipé',checked:false},
+{id:genId(),label:'Capacité de classe débloquée',checked:false}
+],width:'100',newLine:true,color:'#27ae60'}]}]}
+]}}
+function mkChar_DescenteJdT(){return{name:"Héros Descent",pages:[
+{name:"Fiche",panels:[
+{id:genId(),title:"Identité",titleColor:"#8b2500",fields:[
+{id:genId(),type:'text',label:'Nom du Héros',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Archétype',value:'Guerrier',width:'50',newLine:false,align:'center',color:'#1a1a1a'}]},
+{id:genId(),title:"Statistiques",titleColor:"#c0392b",fields:[
+{id:genId(),type:'ring',label:'PV',value:12,max:15,color:'#c0392b',ringSize:80,width:'25',newLine:true,align:'center'},
+{id:genId(),type:'ring',label:'Endurance',value:4,max:5,color:'#e67e22',ringSize:80,width:'25',newLine:false,align:'center'},
+{id:genId(),type:'number',label:'Vitesse',value:4,min:1,max:8,width:'25',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Défense',value:2,min:0,max:6,width:'25',newLine:false,align:'center',color:'#1f618d'}]},
+{id:genId(),title:"Attributs Héroïques",titleColor:"#2980b9",fields:[
+{id:genId(),type:'number',label:'Puissance',value:3,min:0,max:6,width:'25',newLine:true,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Connaissance',value:1,min:0,max:6,width:'25',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Astuce',value:2,min:0,max:6,width:'25',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Volonté',value:2,min:0,max:6,width:'25',newLine:false,align:'center',color:'#9b59b6'}]},
+{id:genId(),title:"Équipement & Tokens",titleColor:"#7f8c8d",fields:[
+{id:genId(),type:'text',label:'Arme',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Armure',value:'',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Autre objet',value:'',width:'100',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'dots',label:'Pièces d\'or',value:0,max:10,width:'50',newLine:true,align:'center',size:'3',color:'#f1c40f'},
+{id:genId(),type:'dots',label:'Potions',value:0,max:3,width:'50',newLine:false,align:'center',size:'4',color:'#c0392b'},
+{id:genId(),type:'status',label:'',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Étourdi',activeColor:'#e67e22',active:false},
+{id:genId(),label:'Empoisonné',activeColor:'#27ae60',active:false},
+{id:genId(),label:'Fatigué',activeColor:'#7f8c8d',active:false},
+{id:genId(),label:'Brûlé',activeColor:'#e74c3c',active:false}]}]}]}
+]}}
+function mkChar_KingdomDeath(){return{name:"Survivant Kingdom Death",pages:[
+{name:"Profil",panels:[
+{id:genId(),title:"Identité",titleColor:"#1a0a0a",fields:[
+{id:genId(),type:'text',label:'Nom',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Règlement',value:'Nouvelle Génération 1',width:'50',newLine:false,align:'center',color:'#555'},
+{id:genId(),type:'number',label:'Années survécu',value:0,min:0,max:25,width:'33',newLine:true,align:'center',color:'#f39c12'},
+{id:genId(),type:'number',label:'Combats',value:0,min:0,max:99,width:'33',newLine:false,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Ressources',value:3,min:0,max:999,width:'33',newLine:false,align:'center',color:'#27ae60'}]},
+{id:genId(),title:"Survie & Combat",titleColor:"#c0392b",fields:[
+{id:genId(),type:'ring',label:'Survie',value:1,max:9,color:'#e74c3c',ringSize:100,width:'25',newLine:true,align:'center'},
+{id:genId(),type:'ring',label:'Insanité',value:0,max:9,color:'#9b59b6',ringSize:100,width:'25',newLine:false,align:'center'},
+{id:genId(),type:'ring',label:'PV',value:6,max:8,color:'#c0392b',ringSize:100,width:'25',newLine:false,align:'center'},
+{id:genId(),type:'number',label:'Evasion',value:0,min:0,max:10,width:'25',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'status',label:'Effets permanents',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Mort',activeColor:'#1a1a1a',active:false},
+{id:genId(),label:'Retraite',activeColor:'#7f8c8d',active:false},
+{id:genId(),label:'Folie',activeColor:'#9b59b6',active:false},
+{id:genId(),label:'Désavantagé',activeColor:'#e67e22',active:false},
+{id:genId(),label:'Courageux',activeColor:'#f1c40f',active:false}]}]},
+{id:genId(),title:"Attributs de Combat",titleColor:"#2c3e50",fields:[
+{id:genId(),type:'number',label:'Précision',value:0,min:0,max:10,width:'25',newLine:true,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Force',value:0,min:0,max:10,width:'25',newLine:false,align:'center',color:'#c0392b'},
+{id:genId(),type:'number',label:'Agilité',value:0,min:0,max:10,width:'25',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'number',label:'Armure totale',value:0,min:0,max:16,width:'25',newLine:false,align:'center',color:'#7f8c8d'}]},
+{id:genId(),title:"Équipement",titleColor:"#7f8c8d",fields:[
+{id:genId(),type:'checklist-v',label:'',items:[
+{id:genId(),label:'Casque',checked:false},{id:genId(),label:'Armure buste',checked:false},
+{id:genId(),label:'Jambières',checked:false},{id:genId(),label:'Gants',checked:false},
+{id:genId(),label:'Arme principale',checked:false},{id:genId(),label:'Bouclier',checked:false}
+],width:'50',newLine:true,color:'#7f8c8d'},
+{id:genId(),type:'dots',label:'Jetons de Survie',value:1,max:9,width:'50',newLine:false,align:'center',size:'3',color:'#f39c12'}]}]},
+{name:"Histoire",panels:[
+{id:genId(),title:"Malédictions & Bénédictions",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'checklist-v',label:'',items:[
+{id:genId(),label:'Aberration (voir règle)',checked:false},
+{id:genId(),label:'Enfant de la Lanterne',checked:false},
+{id:genId(),label:'Rêveur',checked:false}
+],width:'100',newLine:true,color:'#9b59b6'}]},
+{id:genId(),title:"Journal de Survie",titleColor:"#1a0a0a",fields:[
+{id:genId(),type:'textarea',label:'',value:'',width:'100',newLine:true,align:'center',color:'#1a1a1a',height:120,bgColor:'transparent'}]}]}
+]}}
+function mkChar_Massive(){return{name:"Héros Massive Darkness",pages:[
+{name:"Fiche",panels:[
+{id:genId(),title:"Identité",titleColor:"#1a1a4e",fields:[
+{id:genId(),type:'text',label:'Nom',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Classe',value:'Moine des Ombres',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Race',value:'Humain',width:'50',newLine:true,align:'center',color:'#555'}]},
+{id:genId(),title:"Combat",titleColor:"#c0392b",fields:[
+{id:genId(),type:'ring',label:'PV',value:12,max:15,color:'#c0392b',ringSize:100,width:'33',newLine:true,align:'center'},
+{id:genId(),type:'ring',label:'Niveau',value:1,max:5,color:'#f39c12',ringSize:100,width:'33',newLine:false,align:'center'},
+{id:genId(),type:'ring',label:'XP',value:0,max:10,color:'#3498db',ringSize:100,width:'33',newLine:false,align:'center'},
+{id:genId(),type:'number',label:'Dés Attaque',value:2,min:0,max:8,width:'33',newLine:true,align:'center',color:'#e74c3c'},
+{id:genId(),type:'number',label:'Dés Défense',value:1,min:0,max:6,width:'33',newLine:false,align:'center',color:'#3498db'},
+{id:genId(),type:'number',label:'Mouvement',value:3,min:1,max:8,width:'33',newLine:false,align:'center',color:'#27ae60'},
+{id:genId(),type:'dice',label:'Dés',value:0,width:'100',newLine:true,align:'center'}]},
+{id:genId(),title:"États",titleColor:"#8e44ad",fields:[
+{id:genId(),type:'status',label:'',width:'100',newLine:true,align:'center',statuses:[
+{id:genId(),label:'Dans l\'Ombre',activeColor:'#34495e',active:false},
+{id:genId(),label:'Rage',activeColor:'#c0392b',active:false},
+{id:genId(),label:'Bénédiction',activeColor:'#f1c40f',active:false},
+{id:genId(),label:'Malédiction',activeColor:'#9b59b6',active:false}]}]},
+{id:genId(),title:"Équipement (4 emplacements)",titleColor:"#7f8c8d",fields:[
+{id:genId(),type:'text',label:'Slot 1',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Slot 2',value:'',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Slot 3',value:'',width:'50',newLine:true,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'text',label:'Slot 4',value:'',width:'50',newLine:false,align:'center',color:'#1a1a1a'},
+{id:genId(),type:'number',label:'Pièces d\'or',value:0,min:0,max:999,width:'100',newLine:true,align:'center',color:'#f1c40f'}]}]}
+]}}
+/* === STATE === */
+let S={mode:'play',theme:'light',charIdx:0,pageIdx:0,characters:[]};
+let _saveTimer=null,_menuOpen=false,_confirmCb=null,_colorCb=null,_numTarget=null,_numMode='set',_selSaveId=null,deferredPrompt=null;
+/* === SAVE SYSTEM === */
+function schedSave(){
+$('saveIndicator').className='save-indicator pending';
+clearTimeout(_saveTimer);
+_saveTimer=setTimeout(()=>{
+try{localStorage.setItem(SK,JSON.stringify(S));$('saveIndicator').className='save-indicator saved';setTimeout(()=>{$('saveIndicator').className='save-indicator';},1500);}catch(e){console.error('[Save Error]',e);}
+},600);
+}
+function sanitizeChar(c){
+if(!c||typeof c!=='object')return mkChar();
+if(!c.name)c.name='Aventurier';
+if(!Array.isArray(c.pages)||!c.pages.length)c.pages=[{name:'Principal',panels:[]}];
+c.pages.forEach(pg=>{
+if(!pg.name)pg.name='Page';
+if(!Array.isArray(pg.panels))pg.panels=[];
+pg.panels.forEach(pnl=>{
+if(!pnl.id)pnl.id=genId();
+if(!pnl.title)pnl.title='Section';
+if(!pnl.titleColor)pnl.titleColor='#2c3e50';
+if(!Array.isArray(pnl.fields))pnl.fields=[];
+pnl.fields.forEach(f=>{
+if(!f.id)f.id=genId();
+if(!f.type)f.type='text';
+if(!f.width)f.width='auto';
+if(!f.align)f.align='center';
+if(f.newLine===undefined)f.newLine=false;
+// Sanitize type-specific fields
+if(f.type==='health'||f.type==='healthmax'){if(!f.max||f.max<1)f.max=10;if(f.value===undefined||f.value<0)f.value=f.max;}
+if(f.type==='dots'||f.type==='squares'){if(!f.max||f.max<1)f.max=5;if(f.value===undefined)f.value=0;}
+if(f.type==='ring'){if(!f.max||f.max<1)f.max=10;if(f.value===undefined)f.value=0;if(!f.ringSize)f.ringSize=70;}
+if(f.type==='number'){if(f.value===undefined)f.value=0;}
+if(f.type==='text'||f.type==='textarea'){if(f.value===undefined)f.value='';}
+if(f.type==='status'&&!Array.isArray(f.statuses))f.statuses=[];
+if((f.type==='checklist-h'||f.type==='checklist-v')&&!Array.isArray(f.items))f.items=[];
+if(f.type==='dice'&&f.value===undefined)f.value=0;
+});
+});
+});
+return c;
+}
+function loadFromStorage(){
+try{const r=localStorage.getItem(SK);if(r){const p=JSON.parse(r);S={...S,...p};}}catch(e){console.warn('[Load Error]',e);}
+if(!S.characters||!S.characters.length){S.characters=[mkChar()];}
+// Deep sanitize every character
+S.characters=S.characters.map(c=>sanitizeChar(c));
+S.charIdx=clamp(S.charIdx||0,0,S.characters.length-1);
+const pages=S.characters[S.charIdx].pages;
+if(!pages||!pages.length){S.characters[S.charIdx].pages=[{name:'Principal',panels:[]}];}
+S.pageIdx=clamp(S.pageIdx||0,0,S.characters[S.charIdx].pages.length-1);
+}
+const curChar=()=>S.characters[S.charIdx];
+const curPage=()=>{const ch=curChar();if(!ch)return{panels:[]};const pg=ch.pages[S.pageIdx];if(!pg){S.pageIdx=0;return ch.pages[0]||{panels:[]};}return pg;};
+/* === THEME & MODE === */
+function toggleTheme(){closeMenu();S.theme=S.theme==='light'?'dark':'light';applyTheme();schedSave();showToast(S.theme==='dark'?'🌙 Sombre':'☀️ Clair');}
+function applyTheme(){const t=S.theme||'light';document.documentElement.setAttribute('data-theme',t);const color=t==='dark'?'#161a1f':'#2c3e50';document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.content=color);}
+function setMode(m){S.mode=m;$('modeEdit').classList.toggle('active',m==='edit');$('modePlay').classList.toggle('active',m==='play');$('charNameBar').classList.toggle('show',m==='edit');renderAll();schedSave();}
+function applyMode(){const m=S.mode||'play';$('modeEdit').classList.toggle('active',m==='edit');$('modePlay').classList.toggle('active',m==='play');$('charNameBar').classList.toggle('show',m==='edit');}
+/* === MENU === */
+function toggleMenu(){_menuOpen=!_menuOpen;$('dropdownMenu').classList.toggle('show',_menuOpen);$('menuBtn').classList.toggle('open',_menuOpen);}
+function closeMenu(){_menuOpen=false;$('dropdownMenu').classList.remove('show');$('menuBtn').classList.remove('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))closeMenu();});
+/* === TOAST === */
+let _toastT=null;
+function showToast(msg,dur=2200){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(_toastT);_toastT=setTimeout(()=>t.classList.remove('show'),dur);}
+/* === TEMPLATE SHEET === */
+function openTemplateSheet(){
+closeMenu();
+const grid=$('templateGrid');
+// Group by category
+const bycat={};
+TEMPLATES.forEach(t=>{(bycat[t.cat]=bycat[t.cat]||[]).push(t);});
+const order=['start','fantasy','horror','gothic','scifi','board','generic'];
+let html='';
+order.forEach(cat=>{
+const list=bycat[cat];
+if(!list||!list.length)return;
+const ci=TEMPLATE_CATS[cat]||{label:cat,icon:'📋'};
+html+=`<div class="tpl-cat-header">${ci.icon} ${ci.label}</div>`;
+html+=`<div class="tpl-cat-grid">${list.map(t=>`<div class="template-card" onclick="selectTemplate('${t.id}')"><div class="tpl-icon">${t.icon}</div><div class="tpl-name">${t.name}</div><div class="tpl-desc">${t.desc}</div></div>`).join('')}</div>`;
+});
+grid.innerHTML=html;
+$('ovTemplate').classList.add('show');
+$('sheetTemplate').classList.add('show');
+}
+function closeTemplateSheet(){$('ovTemplate').classList.remove('show');$('sheetTemplate').classList.remove('show');}
+function selectTemplate(id){const tpl=TEMPLATES.find(t=>t.id===id);if(!tpl)return;closeTemplateSheet();closeMenu();openConfirm('Nouveau personnage','Remplacer le personnage actuel ?',()=>{S.characters[S.charIdx]=tpl.fn();S.pageIdx=0;renderAll();schedSave();showToast('✅ Template appliqué');});}
+/* === CONFIRM === */
+function openConfirm(title,text,cb){$('confirmTitle').textContent=title;$('confirmText').textContent=text;_confirmCb=cb;$('ovConfirm').classList.add('show');$('sheetConfirm').classList.add('show');}
+function closeConfirmSheet(){$('ovConfirm').classList.remove('show');$('sheetConfirm').classList.remove('show');_confirmCb=null;}
+function confirmYes(){const cb=_confirmCb;closeConfirmSheet();if(cb)cb();}
+/* === COLOR PICKER === */
+function openColorPicker(cur,cb){_colorCb=cb;$('colorGrid').innerHTML=COLORS.map(c=>`<div class="color-swatch${c===cur?' active':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`).join('');$('ovColor').classList.add('show');$('sheetColor').classList.add('show');}
+function closeColorPicker(){$('ovColor').classList.remove('show');$('sheetColor').classList.remove('show');_colorCb=null;}
+function pickColor(c){if(_colorCb)_colorCb(c);closeColorPicker();}
+/* === NUM MODAL === */
+function setNumMode(m){_numMode=m;['set','add','sub'].forEach(k=>{const el=$('numMode'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.classList.toggle('active',k===m);});if(_numTarget&&_numTarget.isMax)updateNumPreviewMax();else updateNumPreview();}
+function updateNumPreview(){if(!_numTarget)return;const{pi,fi,isHealth}=_numTarget;const f=_fld(pi,fi);if(!f)return;const cur=f.value||0;const raw=parseInt($('numInput').value,10);const mn=isHealth?0:(f.min??0);const mx=isHealth?(f.max||10):(f.max??99);let next=cur;if(!isNaN(raw)){if(_numMode==='set')next=clamp(raw,mn,mx);else if(_numMode==='add')next=clamp(cur+raw,mn,mx);else next=clamp(cur-raw,mn,mx);}$('numPreview').textContent=next;$('numPreview').style.color=next>cur?'var(--green)':(next<cur?'var(--red)':'var(--accent)');}
+function openNumModal(pi,fi,isHealth=false,label=''){_numTarget={pi,fi,isHealth};_numMode='set';$('numModalTitle').textContent=label||'Modifier';['numModeSet','numModeAdd','numModeSub'].forEach(id=>{const el=$(id);if(el)el.classList.remove('active');});$('numModeSet').classList.add('active');const inp=$('numInput');inp.value='';const f=_fld(pi,fi)||{value:0};$('numPreview').textContent=f.value??0;$('numPreview').style.color='var(--accent)';inp.removeEventListener('input',updateNumPreview);inp.removeEventListener('input',updateNumPreviewMax);inp.addEventListener('input',updateNumPreview);$('ovNum').classList.add('show');$('numModal').classList.add('show');setTimeout(()=>inp.focus(),80);}
+function closeNumModal(){const inp=$('numInput');inp.removeEventListener('input',updateNumPreview);inp.removeEventListener('input',updateNumPreviewMax);$('ovNum').classList.remove('show');$('numModal').classList.remove('show');_numTarget=null;}
+function openMaxModal(pi,fi){const f=_fld(pi,fi);if(!f)return;_numTarget={pi,fi,isHealth:false,isMax:true};_numMode='set';$('numModalTitle').textContent='Max';['numModeSet','numModeAdd','numModeSub'].forEach(id=>{const el=$(id);if(el)el.classList.remove('active');});$('numModeSet').classList.add('active');const inp=$('numInput');inp.value='';$('numPreview').textContent=f.max??10;$('numPreview').style.color='var(--accent)';inp.removeEventListener('input',updateNumPreview);inp.removeEventListener('input',updateNumPreviewMax);inp.addEventListener('input',updateNumPreviewMax);$('ovNum').classList.add('show');$('numModal').classList.add('show');setTimeout(()=>inp.focus(),80);}
+function updateNumPreviewMax(){if(!_numTarget||!_numTarget.isMax)return;const{pi,fi}=_numTarget;const f=_fld(pi,fi);if(!f)return;const raw=parseInt($('numInput').value,10);const cur=f.max||10;let next;if(isNaN(raw)){$('numPreview').textContent=cur;$('numPreview').style.color='var(--accent)';return;}if(_numMode==='set')next=Math.max(1,raw);else if(_numMode==='add')next=Math.max(1,cur+raw);else next=Math.max(1,cur-raw);$('numPreview').textContent=next;$('numPreview').style.color=next>cur?'var(--green)':(next<cur?'var(--red)':'var(--accent)');}
+function applyNumChange(){if(!_numTarget)return;const{pi,fi,isHealth,isMax}=_numTarget;const raw=parseInt($('numInput').value,10);const f=_fld(pi,fi);if(!f){closeNumModal();return;}if(isMax){if(!isNaN(raw)&&raw>=1){let next;if(_numMode==='set')next=Math.max(1,raw);else if(_numMode==='add')next=Math.max(1,(f.max||10)+raw);else next=Math.max(1,(f.max||10)-raw);f.max=next;if(f.value>f.max)f.value=f.max;renderMain();schedSave();}closeNumModal();return;}const mn=isHealth?0:(f.min??0);const mx=isHealth?(f.max||10):(f.max??99);if(!isNaN(raw)){let next;if(_numMode==='set')next=clamp(raw,mn,mx);else if(_numMode==='add')next=clamp((f.value||0)+raw,mn,mx);else next=clamp((f.value||0)-raw,mn,mx);f.value=next;renderMain();schedSave();}closeNumModal();}
+/* === SAVE/LOAD === */
+const getSaves=()=>{try{return JSON.parse(localStorage.getItem(SVK)||'[]');}catch(e){return[];}};
+const setSaves=s=>localStorage.setItem(SVK,JSON.stringify(s));
+function openSaveSheet(){closeMenu();_selSaveId=null;$('saveName').value='';renderSaveListSave();$('ovSave').classList.add('show');$('sheetSave').classList.add('show');setTimeout(()=>$('saveName').focus(),80);}
+function closeSaveSheet(){$('ovSave').classList.remove('show');$('sheetSave').classList.remove('show');_selSaveId=null;}
+function renderSaveListSave(){const saves=getSaves(),el=$('saveListSave');if(!saves.length){el.innerHTML='<p style="text-align:center;color:var(--text-3);padding:16px;font-style:italic">Aucune sauvegarde</p>';return;}el.innerHTML=saves.map(s=>`<div class="save-item${_selSaveId===s.id?' sel':''}"><div class="save-item-info" onclick="selectSaveForUpdate('${s.id}')"><div class="save-item-name">${esc(s.name)}</div><div class="save-item-date">${s.date}</div></div><button class="btn xs danger" onclick="deleteSaveS('${s.id}')">×</button></div>`).join('');}
+function selectSaveForUpdate(id){_selSaveId=id;const s=getSaves().find(x=>x.id===id);if(s)$('saveName').value=s.name;renderSaveListSave();}
+function deleteSaveS(id){openConfirm('Supprimer?','',()=>{setSaves(getSaves().filter(x=>x.id!==id));if(_selSaveId===id)_selSaveId=null;renderSaveListSave();showToast('Supprimé');});}
+function performSave(){const name=$('saveName').value.trim()||'Sauvegarde '+fmtDate();let saves=getSaves();const obj={id:_selSaveId||genId(),name,date:fmtDate(),characters:clone(S.characters)};if(_selSaveId){const i=saves.findIndex(x=>x.id===_selSaveId);if(i!==-1)saves[i]=obj;else saves.unshift(obj);showToast('✅ Mis à jour');}else{saves.unshift(obj);showToast('✅ Sauvegardé');}if(saves.length>25)saves=saves.slice(0,25);setSaves(saves);closeSaveSheet();}
+function openLoadSheet(){closeMenu();renderSaveListLoad();$('ovLoad').classList.add('show');$('sheetLoad').classList.add('show');}
+function closeLoadSheet(){$('ovLoad').classList.remove('show');$('sheetLoad').classList.remove('show');}
+function renderSaveListLoad(){const saves=getSaves(),el=$('saveList');if(!saves.length){el.innerHTML='<p style="text-align:center;color:var(--text-3);padding:24px;font-style:italic">Aucune sauvegarde</p>';return;}el.innerHTML=saves.map((s,i)=>`<div class="save-item"><div class="save-item-info"><div class="save-item-name">${esc(s.name)}</div><div class="save-item-date">${s.date}</div></div><div class="save-item-actions"><button class="btn sm primary" onclick="doLoad(${i})">Charger</button><button class="btn sm danger" onclick="doDelLoad(${i})">×</button></div></div>`).join('');}
+function doLoad(i){const saves=getSaves();if(!saves[i])return;openConfirm('Charger?','Remplace les personnages actuels',()=>{S.characters=clone(saves[i].characters);S.charIdx=0;S.pageIdx=0;renderAll();schedSave();closeLoadSheet();showToast('📂 Chargé');});}
+function doDelLoad(i){openConfirm('Supprimer?','',()=>{const s=getSaves();s.splice(i,1);setSaves(s);renderSaveListLoad();showToast('Supprimé');});}
+function exportToFile(){closeMenu();const n=prompt('Nom du fichier:','matsforge')||'matsforge';const data=JSON.stringify({name:n.trim(),date:fmtDate(),characters:clone(S.characters)},null,2);const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([data],{type:'application/json'})),download:n.trim().replace(/[^a-z0-9]/gi,'_')+'.json'});document.body.appendChild(a);a.click();document.body.removeChild(a);showToast('📤 Exporté');}
+function importFromFile(){closeMenu();$('fileInput').click();}
+function handleFileImport(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{try{const imp=JSON.parse(ev.target.result);if(!imp.characters)throw new Error();openConfirm('Importer?','Remplace les personnages actuels?',()=>{S.characters=clone(imp.characters);S.charIdx=0;S.pageIdx=0;renderAll();schedSave();showToast('📥 Importé');});}catch{showToast('❌ Fichier invalide');}};r.readAsText(file);e.target.value='';}
+/* === CHARACTERS === */
+function updateCharName(n){curChar().name=n;renderCharBar();schedSave();}
+function duplicateChar(){const c=clone(curChar());S.characters.push(c);S.charIdx=S.characters.length-1;S.pageIdx=0;renderAll();schedSave();showToast('⧉ Dupliqué');}
+function addCharacter(){S.characters.push(mkChar());S.charIdx=S.characters.length-1;S.pageIdx=0;renderAll();schedSave();showToast('✨ Nouveau');}
+function selectCharacter(i){S.charIdx=i;S.pageIdx=0;renderAll();schedSave();}
+function deleteCharacter(i,e){if(e)e.stopPropagation();if(S.characters.length<=1){showToast('Dernier personnage!');return;}openConfirm('Supprimer?',curChar().name,()=>{S.characters.splice(i,1);if(S.charIdx>=S.characters.length)S.charIdx=S.characters.length-1;S.pageIdx=0;renderAll();schedSave();showToast('Supprimé');});}
+function renderCharBar(){$('charBar').innerHTML=S.characters.map((c,i)=>`<div class="char-chip${i===S.charIdx?' active':''}" onclick="selectCharacter(${i})"><span>${esc(c.name)}</span>${S.mode==='edit'&&S.characters.length>1?`<span class="char-chip-del" onclick="deleteCharacter(${i},event)">×</span>`:''}</div>`).join('')+`<button class="char-chip-add" onclick="addCharacter()">+</button>`;}
+function renderCharNameBar(){$('charNameInput').value=curChar().name;}
+/* === PAGES === */
+function addPage(){curChar().pages.push({name:'Page '+(curChar().pages.length+1),panels:[]});S.pageIdx=curChar().pages.length-1;renderAll();schedSave();}
+function selectPage(i){S.pageIdx=i;renderAll();schedSave();}
+function deletePage(i){if(curChar().pages.length<=1)return;openConfirm('Supprimer page?','',()=>{curChar().pages.splice(i,1);if(S.pageIdx>=curChar().pages.length)S.pageIdx=curChar().pages.length-1;renderAll();schedSave();});}
+function renamePage(i,n){curChar().pages[i].name=n;schedSave();}
+function renderPagesBar(){const c=curChar(),e=S.mode==='edit';$('pagesBar').innerHTML=c.pages.map((p,i)=>`<button class="page-tab${i===S.pageIdx?' active':''}" onclick="selectPage(${i})">${e?`<input class="page-name-inp" value="${esc(p.name)}" onchange="renamePage(${i},this.value)" onclick="event.stopPropagation()">`:esc(p.name)}${e&&c.pages.length>1?`<span class="pdel" onclick="event.stopPropagation();deletePage(${i})">×</span>`:''}</button>`).join('')+(e?`<button class="page-tab page-tab-add" onclick="addPage()">+</button>`:'');}
+/* === PANELS === */
+function addPanel(){curPage().panels.push({id:genId(),title:'Section',titleColor:'#2c3e50',fields:[]});renderAll();schedSave();}
+function deletePanel(pi){openConfirm('Supprimer section?','',()=>{const pg=curPage();if(pg&&Array.isArray(pg.panels))pg.panels.splice(pi,1);renderAll();schedSave();});}
+function updatePanelTitle(pi,n){const p=_pnl(pi);if(p)p.title=n;schedSave();}
+function updatePanelColor(pi,c){const p=_pnl(pi);if(p){p.titleColor=c;renderMain();schedSave();}}
+function movePanel(pi,d){const pg=curPage();if(!pg||!Array.isArray(pg.panels))return;const p=pg.panels,ni=pi+d;if(ni<0||ni>=p.length)return;[p[pi],p[ni]]=[p[ni],p[pi]];renderAll();schedSave();}
+function duplicatePanel(pi){const src=_pnl(pi);if(!src)return;const p=clone(src);p.id=genId();(p.fields||[]).forEach(f=>f.id=genId());const pg=curPage();if(pg&&Array.isArray(pg.panels))pg.panels.splice(pi+1,0,p);renderAll();schedSave();showToast('⧉ Dupliqué');}
+/* === FIELDS === */
+function addField(pi,t){const f={id:genId(),type:t,label:FIELD_LABELS[t]||'Champ',width:'auto',newLine:false,align:'center'};if(t==='number')Object.assign(f,{value:0,min:0,max:20,color:'#1a1a1a'});if(t==='dice')Object.assign(f,{value:0,width:'100'});if(t==='dots'||t==='squares')Object.assign(f,{value:0,max:5,color:'#2c3e50',size:'3'});if(t==='text')Object.assign(f,{value:'',color:'#1a1a1a'});if(t==='textarea')Object.assign(f,{value:'',color:'#1a1a1a',height:70,bgColor:'transparent',width:'100'});if(t==='health')Object.assign(f,{value:10,max:10,color:'#c0392b',width:'100',thickness:'md'});if(t==='healthmax')Object.assign(f,{value:10,max:10,color:'#c0392b',width:'100',thickness:'md'});if(t==='status')Object.assign(f,{statuses:[],width:'100'});if(t==='ring')Object.assign(f,{value:5,max:10,color:'#2c3e50',ringSize:70,width:'auto'});Object.assign(f,{items:[{id:genId(),label:'Item',checked:false}],width:'100',color:'#27ae60'});const ap=_pnl(pi);if(ap&&Array.isArray(ap.fields))ap.fields.push(f);renderAll();schedSave();}
+function updateField(pi,fi,k,v){const f=_fld(pi,fi);if(f){f[k]=v;renderMain();schedSave();}}
+function deleteField(pi,fi){openConfirm('Supprimer champ?','',()=>{const dp=_pnl(pi);if(dp&&Array.isArray(dp.fields))dp.fields.splice(fi,1);renderAll();schedSave();});}
+function duplicateField(pi,fi){const src=_fld(pi,fi);if(!src)return;const f=clone(src);f.id=genId();const dfp=_pnl(pi);if(dfp&&Array.isArray(dfp.fields))dfp.fields.splice(fi+1,0,f);renderAll();schedSave();showToast('⧉ Dupliqué');}
+function moveField(pi,fi,d){const mfp=_pnl(pi);if(!mfp||!Array.isArray(mfp.fields))return;const f=mfp.fields,ni=fi+d;if(ni<0||ni>=f.length)return;[f[fi],f[ni]]=[f[ni],f[fi]];renderAll();schedSave();}
+/* === INTERACTIONS === */
+/* === FIELD ACTION HELPERS === */
+function _pnl(pi){const pg=curPage();return pg&&Array.isArray(pg.panels)?pg.panels[pi]:undefined;}
+function _fld(pi,fi){const p=_pnl(pi);return p&&Array.isArray(p.fields)?p.fields[fi]:undefined;}
+function adjNum(pi,fi,d){const f=_fld(pi,fi);if(!f)return;f.value=clamp((f.value||0)+d,f.min??0,f.max??99);renderMain();schedSave();}
+function setDotVal(pi,fi,v){const f=_fld(pi,fi);if(!f)return;f.value=f.value===v?Math.max(0,v-1):v;renderMain();schedSave();}
+function adjHealth(pi,fi,d){const f=_fld(pi,fi);if(!f)return;f.value=clamp((f.value||0)+d,0,f.max||10);renderMain();schedSave();}
+function tapNum(pi,fi){const f=_fld(pi,fi);if(!f)return;openNumModal(pi,fi,false,f.label);}
+function tapHealth(pi,fi){const f=_fld(pi,fi);if(!f)return;openNumModal(pi,fi,true,f.label);}
+function togStatus(pi,fi,sid){const f=_fld(pi,fi);if(!f||!Array.isArray(f.statuses))return;const s=f.statuses.find(x=>x.id===sid);if(s){s.active=!s.active;renderMain();schedSave();}}
+function addStatus(pi,fi){const f=_fld(pi,fi);if(!f)return;const l=prompt('Nom:');if(!l?.trim())return;if(!Array.isArray(f.statuses))f.statuses=[];f.statuses.push({id:genId(),label:l.trim(),activeColor:COLORS[0],active:false});renderMain();schedSave();}
+function delStatus(pi,fi,sid){const f=_fld(pi,fi);if(!f||!Array.isArray(f.statuses))return;const i=f.statuses.findIndex(x=>x.id===sid);if(i!==-1){f.statuses.splice(i,1);renderMain();schedSave();}}
+function updStatusColor(pi,fi,sid,c){const f=_fld(pi,fi);if(!f||!Array.isArray(f.statuses))return;const s=f.statuses.find(x=>x.id===sid);if(s){s.activeColor=c;renderMain();schedSave();}}
+function updStatusLabel(pi,fi,sid,l){const f=_fld(pi,fi);if(!f||!Array.isArray(f.statuses))return;const s=f.statuses.find(x=>x.id===sid);if(s){s.label=l;schedSave();}}
+function togCheck(pi,fi,iid){const f=_fld(pi,fi);if(!f||!Array.isArray(f.items))return;const it=f.items.find(x=>x.id===iid);if(it){if(!it.checked){it.checked=true;it.struck=false;}else if(!it.struck){it.struck=true;}else{it.checked=false;it.struck=false;}renderMain();schedSave();}}
+function addCheckItem(pi,fi){const f=_fld(pi,fi);if(!f)return;const l=prompt('Texte:');if(!l?.trim())return;if(!Array.isArray(f.items))f.items=[];f.items.push({id:genId(),label:l.trim(),checked:false});renderMain();schedSave();}
+function delCheckItem(pi,fi,iid){const f=_fld(pi,fi);if(!f||!Array.isArray(f.items))return;const i=f.items.findIndex(x=>x.id===iid);if(i!==-1){f.items.splice(i,1);renderMain();schedSave();}}
+function updCheckLabel(pi,fi,iid,l){const f=_fld(pi,fi);if(!f||!Array.isArray(f.items))return;const it=f.items.find(x=>x.id===iid);if(it){it.label=l;schedSave();}}
+/* === RENDER HELPERS === */
+const isEdit=()=>S.mode==='edit';
+function mkLbl(f,pi,fi){return isEdit()?`<input class="field-label-inp" value="${esc(f.label)}" onchange="updateField(${pi},${fi},'label',this.value)">`:(f.label?`<div class="field-label">${esc(f.label)}</div>`:'');}
+function mkColorDot(color,cb){return `<div class="color-dot" style="background:${color}" onclick="${cb}"></div>`;}
+function mkSizeSel(f,pi,fi){return `<div class="setting-row"><label>Taille</label><div class="mini-group">${[1,2,3,4,5].map(v=>`<button class="mini-btn${(f.size||'3')==v?' on':''}" onclick="updateField(${pi},${fi},'size','${v}')">${v}</button>`).join('')}</div></div>`;}
+function mkAlignSel(f,pi,fi){const a=f.align||'center';return `<div class="setting-row"><label>Align</label><div class="mini-group"><button class="mini-btn${a==='left'?' on':''}" onclick="updateField(${pi},${fi},'align','left')">◀</button><button class="mini-btn${a==='center'?' on':''}" onclick="updateField(${pi},${fi},'align','center')">●</button><button class="mini-btn${a==='right'?' on':''}" onclick="updateField(${pi},${fi},'align','right')">▶</button></div></div>`;}
+function mkWidthSel(f,pi,fi){const opts=['auto','25','33','50','100'];return `<div class="setting-row"><label>Larg</label><div class="mini-group">${opts.map(v=>`<button class="mini-btn${(f.width||'auto')===v?' on':''}" onclick="updateField(${pi},${fi},'width','${v}')">${v==='auto'?'A':v}</button>`).join('')}</div></div>`;}
+function mkNL(f,pi,fi){return `<div class="setting-row"><label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" ${f.newLine?'checked':''} style="width:16px;height:16px" onchange="updateField(${pi},${fi},'newLine',this.checked)"> Nouvelle ligne</label></div>`;}
+function mkCtrl(pi,fi){return `<div class="field-ctrl-row"><button class="btn xs ghost" onclick="moveField(${pi},${fi},-1)">←</button><button class="btn xs ghost" onclick="moveField(${pi},${fi},1)">→</button><button class="btn xs ghost" onclick="duplicateField(${pi},${fi})">Dup.</button><button class="btn xs danger" onclick="deleteField(${pi},${fi})">Suppr.</button></div>`;}
+/* === WIDGET RENDERERS === */
+function rNum(f,pi,fi){const c=f.color||'#1a1a1a',e=isEdit();const tapFn=!e?`onclick="tapNum(${pi},${fi})"`:'';return mkLbl(f,pi,fi)+`<div class="field-number"><div class="num-val" style="color:${c}" ${tapFn}>${f.value??0}</div><div class="num-btns"><button class="num-btn" onclick="adjNum(${pi},${fi},-1)">−</button><button class="num-btn" onclick="adjNum(${pi},${fi},1)">+</button></div></div>`+(e?`<div class="field-settings open" id="fs_${f.id}"><div class="setting-row"><label>Min</label><input type="number" value="${f.min??0}" onchange="updateField(${pi},${fi},'min',+this.value)"><label>Max</label><input type="number" value="${f.max??20}" onchange="updateField(${pi},${fi},'max',+this.value)"></div><div class="setting-row"><label>Coul.</label>${mkColorDot(c,`openColorPicker('${c}',c=>updateField(${pi},${fi},'color',c))`)}</div>${mkWidthSel(f,pi,fi)}${mkAlignSel(f,pi,fi)}${mkNL(f,pi,fi)}${mkCtrl(pi,fi)}</div>`:'');}
+function rHealth(f,pi,fi){const c=f.color||'#c0392b',max=f.max||10,val=clamp(f.value||0,0,max);const pct=(val/max)*100,e=isEdit();const isMax=f.type==='healthmax';const tapFn=!e?`onclick="tapHealth(${pi},${fi})"`:'';const tapMaxFn=!e&&isMax?`onclick="openMaxModal(${pi},${fi})" style="cursor:pointer"`:'';return mkLbl(f,pi,fi)+`<div class="health-wrap"><div class="health-bar-outer" style="height:22px"><div class="health-bar-fill" style="width:${pct}%;background:${c}"></div></div><div class="health-ctrl"><button class="health-btn dmg" onclick="adjHealth(${pi},${fi},-1)">−</button><div style="display:flex;align-items:baseline;gap:1px;cursor:pointer" ${tapFn}><div class="health-curr" style="color:${c}">${val}</div><div class="health-max-lbl" ${tapMaxFn}>/ ${max}</div></div><button class="health-btn heal" onclick="adjHealth(${pi},${fi},1)">+</button></div></div>`+(e?`<div class="field-settings open" id="fs_${f.id}"><div class="setting-row"><label>Max</label><input type="number" value="${max}" min="1" onchange="updateField(${pi},${fi},'max',+this.value||10)"></div><div class="setting-row"><label>Coul.</label>${mkColorDot(c,`openColorPicker('${c}',c=>updateField(${pi},${fi},'color',c))`)}</div>${mkWidthSel(f,pi,fi)}${mkAlignSel(f,pi,fi)}${mkNL(f,pi,fi)}${mkCtrl(pi,fi)}</div>`:'');}
+function rDots(f,pi,fi,isSq=false){const c=f.color||'#2c3e50',sz=f.size||'3',cls=isSq?'sq':'dot',e=isEdit();const dots=Array(f.max||5).fill(0).map((_,i)=>{const on=i<(f.value||0);return `<div class="${cls}${on?' on':''}" data-sz="${sz}" style="border-color:${c};${on?`background:${c}`:'background:transparent'}" onclick="setDotVal(${pi},${fi},${i+1})"></div>`;}).join('');return mkLbl(f,pi,fi)+`<div class="${isSq?'sq-row':'dots-row'}">${dots}</div>`+(e?`<div class="field-settings open" id="fs_${f.id}"><div class="setting-row"><label>Nombre</label><input type="number" value="${f.max||5}" min="1" max="30" onchange="updateField(${pi},${fi},'max',+this.value||5)"></div>${mkSizeSel(f,pi,fi)}<div class="setting-row"><label>Coul.</label>${mkColorDot(c,`openColorPicker('${c}',c=>updateField(${pi},${fi},'color',c))`)}</div>${mkWidthSel(f,pi,fi)}${mkAlignSel(f,pi,fi)}${mkNL(f,pi,fi)}${mkCtrl(pi,fi)}</div>`:'');}
+function rText(f,pi,fi){const c=f.color||'#1a1a1a',e=isEdit();return mkLbl(f,pi,fi)+`<input type="text" class="f-text" value="${esc(f.value||'')}" style="color:${c}" onchange="updateField(${pi},${fi},'value',this.value)">`+(e?`<div class="field-settings open" id="fs_${f.id}"><div class="setting-row"><label>Coul.</label>${mkColorDot(c,`openColorPicker('${c}',c=>updateField(${pi},${fi},'color',c))`)}</div>${mkWidthSel(f,pi,fi)}${mkAlignSel(f,pi,fi)}${mkNL(f,pi,fi)}${mkCtrl(pi,fi)}</div>`:'');}
+function rTA(f,pi,fi){const c=f.color||'#1a1a1a',bg=f.bgColor||'transparent',e=isEdit();return mkLbl(f,pi,fi)+`<textarea class="f-textarea" style="color:${c};background:${bg};min-height:${f.height||70}px" onchange="updateField(${pi},${fi},'value',this.value)">${esc(f.value||'')}</textarea>`+(e?`<div class="field-settings open" id="fs_${f.id}"><div class="setting-row"><label>Haut.</label><input type="number" value="${f.height||70}" min="40" max="500" step="10" onchange="updateField(${pi},${fi},'height',+this.value||70)"></div><div class="setting-row"><label>Texte</label>${mkColorDot(c,`openColorPicker('${c}',c=>updateField(${pi},${fi},'color',c))`)}</div><div class="setting-row"><label>Fond</label>${mkColorDot(bg==='transparent'?'#ffffff':bg,`openColorPicker('${bg==='transparent'?'#ffffff':bg}',c=>updateField(${pi},${fi},'bgColor',c))`)}<button class="btn xs ghost" onclick="updateField(${pi},${fi},'bgColor','transparent')">Transp.</button></div>${mkWidthSel(f,pi,fi)}${mkAlignSel(f,pi,fi)}${mkNL(f,pi,fi)}${mkCtrl(pi,fi)}</div>`:'');}
+function rStatus(f,pi,fi){const st=f.statuses||[],e=isEdit();const badges=st.map(s=>{const active=s.active;return `<div class="status-badge ${active?'active':'inactive'}" style="${active?`border-color:${s.activeColor};background:${s.activeColor}`:'border-color:var(--border-2)'}" onclick="togStatus(${pi},${fi},'${s.id}')">${esc(s.label)}</div>`;}).join('');return mkLbl(f,pi,fi)+`<div class="status-row">${badges}</div>`+(e?`<div class="field-settings open" id="fs_${f.id}">${st.map(s=>`<div class="setting-row" style="background:var(--bg-raised);padding:5px 7px;border-radius:4px;margin-bottom:2px"><input type="text" value="${esc(s.label)}" style="flex:1;min-width:60px" onchange="updStatusLabel(${pi},${fi},'${s.id}',this.value)">${mkColorDot(s.activeColor,`openColorPicker('${s.activeColor}',c=>updStatusColor(${pi},${fi},'${s.id}',c))`)}<button class="btn-icon sm" style="color:var(--red)" onclick="delStatus(${pi},${fi},'${s.id}')">×</button></div>`).join('')}<button class="btn sm ghost" onclick="addStatus(${pi},${fi})" style="margin-top:4px">+ Ajouter</button>${mkWidthSel(f,pi,fi)}${mkAlignSel(f,pi,fi)}${mkNL(f,pi,fi)}${mkCtrl(pi,fi)}</div>`:'');}
+function rChecklist(f,pi,fi,isV=false){const cc=f.color||'#27ae60',e=isEdit(),cls=isV?'checklist-v':'checklist-h';const items=(f.items||[]).map(it=>`<div class="checklist-item" onclick="togCheck(${pi},${fi},'${it.id}')"><div class="checklist-box" style="${it.checked?`background:${cc};border-color:${cc}`:'border-color:var(--border-2)'}">${it.checked?'✓':''}</div><span class="checklist-text${it.struck?' struck':it.checked?' done':''}">${esc(it.label)}</span></div>`).join('');return mkLbl(f,pi,fi)+`<div class="${cls}">${items}</div>`+(e?`<div class="field-settings open" id="fs_${f.id}">${(f.items||[]).map(it=>`<div class="setting-row" style="background:var(--bg-raised);padding:5px 7px;border-radius:4px;margin-bottom:2px"><input type="text" value="${esc(it.label)}" style="flex:1;min-width:60px" onchange="updCheckLabel(${pi},${fi},'${it.id}',this.value)"><button class="btn-icon sm" style="color:var(--red)" onclick="delCheckItem(${pi},${fi},'${it.id}')">×</button></div>`).join('')}<div class="setting-row"><label>Coul.</label>${mkColorDot(cc,`openColorPicker('${cc}',c=>updateField(${pi},${fi},'color',c))`)}</div><button class="btn sm ghost" onclick="addCheckItem(${pi},${fi})" style="margin-top:4px">+ Ajouter</button>${mkWidthSel(f,pi,fi)}${mkAlignSel(f,pi,fi)}${mkNL(f,pi,fi)}${mkCtrl(pi,fi)}</div>`:'');}
+function rDice(f,pi,fi){
+const e=isEdit(),fid=f.id;
+const DICE_SIDES=[4,6,8,10,12,20,100];
+const btns=DICE_SIDES.map(s=>`<button class="dice-btn" onclick="diceAddToPool('${fid}',${s})">d${s}<span class="dice-btn-count" id="diceBadge_${fid}_${s}">0</span></button>`).join('');
+return mkLbl(f,pi,fi)+`<div class="dice-roller">
+<div class="dice-pool-row" id="dicePool_${fid}"><span class="dice-pool-empty">Cliquez sur les dés pour composer votre lancer</span></div>
+<div class="dice-btns">${btns}</div>
+<div class="dice-mod-row">
+<button class="dice-mod-open-btn" id="diceModBtn_${fid}" onclick="openDiceMod('${fid}')">Mod <span id="diceModLabel_${fid}">—</span></button>
+<button class="dice-roll-btn" onclick="diceRoll('${fid}')">🎲 Lancer</button>
+<button class="dice-clear-btn" onclick="diceClear('${fid}')">✕</button>
+</div>
+<div class="dice-result-box" id="diceResult_${fid}">
+<div class="dice-result-formula"></div>
+<div class="dice-result-total">-</div>
+<div class="dice-result-detail"></div>
+</div>
+</div>`+(e?`<div class="field-settings open" id="fs_${fid}">${mkWidthSel(f,pi,fi)}${mkAlignSel(f,pi,fi)}${mkNL(f,pi,fi)}${mkCtrl(pi,fi)}</div>`:'');
+}
+const RENDERERS={number:(f,pi,fi)=>rNum(f,pi,fi),dice:(f,pi,fi)=>rDice(f,pi,fi),health:(f,pi,fi)=>rHealth(f,pi,fi),healthmax:(f,pi,fi)=>rHealth(f,pi,fi),ring:(f,pi,fi)=>rRing(f,pi,fi),dots:(f,pi,fi)=>rDots(f,pi,fi,false),squares:(f,pi,fi)=>rDots(f,pi,fi,true),text:(f,pi,fi)=>rText(f,pi,fi),textarea:(f,pi,fi)=>rTA(f,pi,fi),status:(f,pi,fi)=>rStatus(f,pi,fi),'checklist-h':(f,pi,fi)=>rChecklist(f,pi,fi,false),'checklist-v':(f,pi,fi)=>rChecklist(f,pi,fi,true)};
+/* === LINE GROUPING === */
+function groupFieldsByLine(fields){if(!Array.isArray(fields)||!fields.length)return[];const lines=[];let curLine=[],curW=0;fields.forEach((f,globalIdx)=>{if(!f||!f.type)return;const w=f.width==='auto'?20:(parseInt(f.width)||20);if(f.newLine&&curLine.length>0){lines.push({items:curLine,totalW:curW});curLine=[];curW=0;}if(curLine.length>0&&curW+w>100){lines.push({items:curLine,totalW:curW});curLine=[];curW=0;}curLine.push({f,globalIdx});curW+=w;if(curW>=100){lines.push({items:curLine,totalW:curW});curLine=[];curW=0;}});if(curLine.length>0)lines.push({items:curLine,totalW:curW});return lines;}
+/* === RENDER ENGINE === */
+function renderField(f,pi,fi){if(!f||!f.type)return'';const w=f.width||'auto',align=f.align||'center';const html=(RENDERERS[f.type]||rText)(f,pi,fi);return `<div class="field-box" data-w="${w}" data-align="${align}" data-pi="${pi}" data-fi="${fi}"${isEdit()?` draggable="true"`:''}>${html}</div>`;}
+function renderAddFieldBar(pi){return `<div class="add-field-bar">${Object.entries(FIELD_LABELS).map(([t,l])=>`<button class="add-field-btn" onclick="addField(${pi},'${t}')">+ ${l}</button>`).join('')}</div>`;}
+function renderPanel(pnl,pi){if(!pnl)return'';const e=isEdit(),tc=pnl.titleColor||'#2c3e50';const fields=Array.isArray(pnl.fields)?pnl.fields:[];const hdr=e?`<input type="text" class="panel-title-input" value="${esc(pnl.title||'')}" style="color:${tc}" onchange="updatePanelTitle(${pi},this.value)">${mkColorDot(tc,`openColorPicker('${tc}',c=>updatePanelColor(${pi},c))`)}<div class="panel-actions"><button class="btn-icon sm" onclick="movePanel(${pi},-1)">↑</button><button class="btn-icon sm" onclick="movePanel(${pi},1)">↓</button><button class="btn-icon sm" onclick="duplicatePanel(${pi})">⧉</button><button class="btn-icon sm danger" onclick="deletePanel(${pi})">×</button></div>`:`<div class="panel-title" style="color:${tc}">${esc(pnl.title||'')}</div>`;const lines=groupFieldsByLine(fields);const fieldsHtml=lines.map(line=>{const isFull=line.totalW>=100;return `<div class="${isFull?'fields-row':'fields-row partial'}">${line.items.map(({f,globalIdx})=>renderField(f,pi,globalIdx)).join('')}</div>`;}).join('');return `<div class="panel"><div class="panel-header">${hdr}</div><div class="fields-container">${fieldsHtml}</div>${e?renderAddFieldBar(pi):''}</div>`;}
+function renderMain(){const pg=curPage(),e=isEdit(),m=$('mainContent');if(!pg.panels.length){m.innerHTML=`<div class="empty-state"><h2>${e?'Page vide':'Rien ici'}</h2><p>${e?'Ajoutez votre première section':'Passez en mode Création'}</p></div>`+(e?`<div class="add-panel-wrap" onclick="addPanel()"><button class="add-panel-btn">+ Ajouter une section</button></div>`:'');}else{m.innerHTML=pg.panels.map(renderPanel).join('')+(e?`<div class="add-panel-wrap" onclick="addPanel()"><button class="add-panel-btn">+ Ajouter une section</button></div>`:'');}if(e)setupDragAndDrop();}
+function renderAll(){renderCharNameBar();renderCharBar();renderPagesBar();renderMain();}
+/* === DRAG & DROP === */
+function setupDragAndDrop(){
+let drag=null;
+document.querySelectorAll('.field-box[draggable="true"]').forEach(el=>{
+el.addEventListener('dragstart',e=>{drag={pi:+el.dataset.pi,fi:+el.dataset.fi};el.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+el.addEventListener('dragend',()=>{el.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));drag=null;});
+el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over');});
+el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag-over');if(!drag)return;const dpi=+el.dataset.pi,dfi=+el.dataset.fi;if(drag.pi===dpi&&drag.fi===dfi)return;const spp=_pnl(drag.pi),dpp=_pnl(dpi);if(!spp||!dpp||!Array.isArray(spp.fields)||!Array.isArray(dpp.fields))return;const sf=spp.fields,df=dpp.fields;const[item]=sf.splice(drag.fi,1);df.splice(dfi,0,item);renderAll();schedSave();drag=null;});
+let longPress=null,touchDrag=false;
+el.addEventListener('touchstart',e=>{touchDrag=false;longPress=setTimeout(()=>{touchDrag=true;drag={pi:+el.dataset.pi,fi:+el.dataset.fi};el.classList.add('touch-drag');navigator.vibrate?.(20);},400);},{passive:true});
+el.addEventListener('touchmove',e=>{clearTimeout(longPress);if(!touchDrag)return;const t=e.touches[0],under=document.elementFromPoint(t.clientX,t.clientY);const tgt=under?.closest('.field-box[draggable="true"]');document.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));if(tgt&&tgt!==el)tgt.classList.add('drag-over');},{passive:true});
+el.addEventListener('touchend',e=>{clearTimeout(longPress);if(!touchDrag||!drag){touchDrag=false;return;}const t=e.changedTouches[0],under=document.elementFromPoint(t.clientX,t.clientY);const tgt=under?.closest('.field-box[draggable="true"]');el.classList.remove('touch-drag');document.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));if(tgt&&tgt!==el){const dpi=+tgt.dataset.pi,dfi=+tgt.dataset.fi;const spp=_pnl(drag.pi),dpp=_pnl(dpi);if(!spp||!dpp||!Array.isArray(spp.fields)||!Array.isArray(dpp.fields))return;const sf=spp.fields,df=dpp.fields;const[item]=sf.splice(drag.fi,1);df.splice(dfi,0,item);renderAll();schedSave();}drag=null;touchDrag=false;});
+});
+}
+/* === SWIPE NAVIGATION === */
+(function(){
+let sx=null;
+const m=$('mainContent');
+m.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+m.addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)<100)return;const pages=curChar().pages;if(dx<0&&S.pageIdx<pages.length-1)selectPage(S.pageIdx+1);else if(dx>0&&S.pageIdx>0)selectPage(S.pageIdx-1);});
+})();
+/* === REDIRECT 127.0.0.1 → localhost === */
+(function(){if(window.location.hostname==='127.0.0.1'){window.location.replace(window.location.href.replace('127.0.0.1','localhost'));}})();
+/* === WAKE LOCK === */
+let wakeLock=null;
+async function requestWakeLock(){if('wakeLock' in navigator){try{wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null;});}catch(e){console.warn('[WakeLock]',e.message);}}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')requestWakeLock();});
+requestWakeLock();
+/* === PWA === */
+function showInstallUI(){const btn=$('installBtn');if(btn)btn.classList.add('show');const mi=$('menuInstallItem');if(mi)mi.style.display='flex';}
+function hideInstallUI(){const btn=$('installBtn');if(btn)btn.classList.remove('show');const mi=$('menuInstallItem');if(mi)mi.style.display='none';}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;if(!window.matchMedia('(display-mode: standalone)').matches){showInstallUI();}});
+function installPWA(){closeMenu();if(!deferredPrompt)return;deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted')showToast("✅ Installé!");deferredPrompt=null;hideInstallUI();});}
+window.addEventListener('appinstalled',()=>{showToast("✅ Installé!");hideInstallUI();deferredPrompt=null;});
+if(window.matchMedia('(display-mode: standalone)').matches){hideInstallUI();}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{console.log('[PWA] SW enregistré');}).catch(err=>{console.warn('[PWA] SW erreur:',err);});});}
+/* === KEYBOARD === */
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&$('numModal').classList.contains('show')){e.preventDefault();applyNumChange();}if(e.key==='Escape'){[['ovSave','sheetSave',closeSaveSheet],['ovLoad','sheetLoad',closeLoadSheet],['ovNum','numModal',closeNumModal],['ovColor','sheetColor',closeColorPicker],['ovConfirm','sheetConfirm',closeConfirmSheet],['ovTemplate','sheetTemplate',closeTemplateSheet],['ovSupport','sheetSupport',closeSupportSheet]].forEach(([ov,sh,fn])=>{if($(sh).classList.contains('show'))fn();});}});
+/* === SUPPORT SHEET === */
+function openSupportSheet(){closeMenu();$('ovSupport').classList.add('show');$('sheetSupport').classList.add('show');}
+function closeSupportSheet(){$('ovSupport').classList.remove('show');$('sheetSupport').classList.remove('show');}
+/* === INIT === */
+try{loadFromStorage();applyTheme();applyMode();renderAll();console.log('✅ Mat\'s Forge initialisé');}catch(e){console.error('❌ Erreur init:',e);showToast('⚠️ Erreur de chargement');}
+</script>
+</body>
+</html>

@@ -4,13 +4,13 @@
    statiques, Network First pour la page
 ══════════════════════════════════════ */
 
-const CACHE_NAME     = 'matsforge-v1';
-const FONT_CACHE     = 'matsforge-fonts-v1';
-const OFFLINE_PAGE   = './matsforge.html';
+const CACHE_NAME     = 'matsforge-v2';
+const FONT_CACHE     = 'matsforge-fonts-v2';
+const OFFLINE_PAGE   = './index.html';
 
 /* Ressources à précacher au moment de l'install */
 const PRECACHE_URLS = [
-  './matsforge.html',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -59,7 +59,7 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
 
   /* 3. Page principale → Network First avec fallback cache */
-  if (url.pathname.endsWith('matsforge.html') || url.pathname === '/') {
+  if (url.pathname.endsWith('index.html') || url.pathname === '/') {
     event.respondWith(networkFirst(request, CACHE_NAME));
     return;
   }

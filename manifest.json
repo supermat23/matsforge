@@ -2,7 +2,7 @@
   "name": "Mat's Forge",
   "short_name": "Mat's Forge",
   "description": "Créateur de fiches de personnage pour jeux de rôle",
-  "start_url": "./matsforge.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#f2efe8",
